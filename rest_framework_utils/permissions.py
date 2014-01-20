@@ -1,10 +1,10 @@
 """ Provides new permission policies for django-rest-framework
 """
 
-from rest_framework.permissions import DjangoModelPermission
+from rest_framework.permissions import DjangoModelPermissions
 
 
-class FullDjangoModelPermission(DjangoModelPermission):
+class FullDjangoModelPermissions(DjangoModelPermissions):
     """ 
     The request is authenticated using `django.contrib.auth` permissions.
     See: https://docs.djangoproject.com/en/dev/topics/auth/#permissions
