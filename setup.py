@@ -17,8 +17,8 @@ with open('requirements.txt') as requirements:
 
 
 setup(
-    name = 'django-rest-framework-utils',
-    version = '0.1.0',
+    name = 'djangorestframework-fine-permissions',
+    version = '0.2.0',
     packages = find_packages(),
     install_requires = libraries,
     dependency_links = dependency_links,
@@ -27,7 +27,7 @@ setup(
     author_email = 'arnaud.grausem@unistra.fr',
     maintainer = 'Arnaud Grausem',
     maintainer_email = 'arnaud.grausem@unistra.fr',
-    description = 'Utilities for the Django Rest Framework',
+    description = 'Field level permissions for Django REST Framework',
     keywords = ['django', 'REST', 'rest_framework', 'permissions'],
     url = 'https://github.com/unistra/django-rest-framework-utils',
     download_url = 'https://pypi.python.org/pypi/django-rest-framework-utils',
