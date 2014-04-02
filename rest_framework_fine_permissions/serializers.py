@@ -4,8 +4,8 @@
 """
 
 from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import RelatedField
 
-from .fields import *
 from .models import FieldPermission
 
 
@@ -16,7 +16,7 @@ class ModelPermissionsSerializer(ModelSerializer):
     def __init__(self, *args, **kwargs):
         super(ModelPermissionsSerializer, self).__init__(*args, **kwargs)
 
-        user = kwargs['context']['request'].user
+        user = self.context['request'].user
         model_name = self.opts.model.__name__.lower()
 
         if user.is_anonymous():
@@ -33,3 +33,20 @@ class ModelPermissionsSerializer(ModelSerializer):
 
         for field_name in existing - allowed:
             self.fields.pop(field_name)
+
+    def get_nested_field(self, model_field, related_model, to_many):
+        """
+        """
+
+        class NestedModelPermissionsSerializer(ModelPermissionsSerializer):
+            class Meta:
+                model = related_model
+                depth = self.opts.depth - 1
+
+        serializer = NestedModelPermissionsSerializer(many=to_many,
+            context=self.context)
+
+        if not serializer.fields:
+            return RelatedField(many=to_many)
+
+        return serializer
