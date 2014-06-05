@@ -1,4 +1,4 @@
-django-rest-framework-utils
-===========================
+django-rest-framework-fine-permissions
+======================================
 
-Utilities for the rest framework library
+New permissions possibilities for rest-framework
