@@ -28,16 +28,16 @@ def create_field_permissions(app, verbosity, **kwargs):
             if inspect.isclass(obj) and _is_seralizer_subclass(obj):
                 try:
                     model = obj.Meta.model
-                    fields = model._meta.fields
+                    field_names = model._meta.get_all_field_names()
                     ctype = ContentType.objects.get_for_model(model)
 
                     # Get current permissions
                     perms = FieldPermission.objects.filter(content_type=ctype)\
                         .values_list('name', flat=True)
-                    names = [field.name for field in fields]
 
                     # Add new permissions
-                    new_names = [name for name in names if name not in perms]
+                    new_names = [name for name in field_names if name not in
+                            iter(perms)]
                     for name in new_names:
                         perm = FieldPermission.objects.create(
                             name=name, content_type=ctype)
