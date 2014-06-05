@@ -16,6 +16,7 @@ class FieldPermission(models.Model):
     class Meta:
         verbose_name = _('field permission')
         verbose_name_plural = _('fields permissions')
+        db_table = 'drf_field_permission'
 
     def __unicode__(self):
         return '{0.content_type.app_label} | {0.content_type.model} | {0.name}'\
@@ -25,11 +26,13 @@ class FieldPermission(models.Model):
 class UserFieldPermissions(models.Model):
     user = models.OneToOneField(User)
     permissions = models.ManyToManyField(FieldPermission,
-        related_name='user_field_permissions')
+        related_name='user_field_permissions',
+        db_table='drf_user_field_permissions_permission')
 
     class Meta:
         verbose_name = _('user field permission')
         verbose_name_plural = _('user fields permissions')
+        db_table = 'drf_user_field_permissions'
 
     def __unicode__(self):
         return self.user.username
