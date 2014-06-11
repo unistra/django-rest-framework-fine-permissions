@@ -13,7 +13,10 @@ class NestedModelPermissionsSerializerOptions(serializers.ModelSerializerOptions
 
     def __init__(self, meta):
         super(NestedModelPermissionsSerializerOptions, self).__init__(meta)
-        self.nested_fields_default = getattr(meta, 'nested_fields_default')
+        try:
+            self.nested_fields_default = getattr(meta, 'nested_fields_default')
+        except AttributeError:
+            self.nested_fields_default = []
 
 
 class ModelPermissionsSerializer(serializers.ModelSerializer):
