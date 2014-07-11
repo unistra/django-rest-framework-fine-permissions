@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class FieldPermission(models.Model):
-    name = models.CharField(_('name'), max_length=100)
+    name = models.CharField(_('name'), max_length=255)
     content_type = models.ForeignKey(ContentType)
 
     class Meta:
