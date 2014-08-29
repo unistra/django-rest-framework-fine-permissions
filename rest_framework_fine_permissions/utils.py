@@ -12,7 +12,7 @@ from django.utils.importlib import import_module
 
 def get_permitted_fields(model, serializer):
     fields = [field.name for field in model._meta.fields]
-    permissions = serializer.base_fields.keys()
+    permissions = list(serializer.base_fields.keys())
 
     return set(fields + permissions)
 
