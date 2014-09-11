@@ -80,7 +80,7 @@ class UserFieldPermissionsAdmin(admin.ModelAdmin):
 
     """
     """
-
+    list_display = ('user', )
     form = UserFieldPermissionsForm
 
 admin.site.register(UserFieldPermissions, UserFieldPermissionsAdmin)
