@@ -6,8 +6,16 @@
 import inspect
 
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.utils.importlib import import_module
+
+
+def inherits_modelpermissions_serializer(cls):
+    """ Verify that serializer is a :py:class:`~rest_framework_fine_permissions.serializers.ModelPermissionsSerializer`. """
+    is_serializer = lambda ser: type(ser).__name__ == 'SerializerMetaclass'
+    is_modelperms = lambda ser: 'ModelPermissionsSerializer' in [
+        cls.__name__ for cls in ser.__bases__
+    ]
+    return inspect.isclass(cls) and is_serializer(cls) and is_modelperms(cls)
 
 
 def get_permitted_fields(model, serializer):
@@ -21,7 +29,6 @@ def get_field_permissions():
     """look for serializers in serializers.py files
     """
     perm_key = lambda m: '{0.app_label}.{0.model_name}'.format(m._meta)
-    is_seralizer = lambda cls: type(cls).__name__ == 'SerializerMetaclass'
     permissions = {}
 
     for app in settings.INSTALLED_APPS:
@@ -31,7 +38,7 @@ def get_field_permissions():
                 obj = getattr(mod, obj_name)
 
                 # Check if it is a serializer subclass
-                if inspect.isclass(obj) and is_seralizer(obj):
+                if inherits_modelpermissions_serializer(obj):
                     try:
                         model = obj.Meta.model
                         fields = get_permitted_fields(model, obj)
