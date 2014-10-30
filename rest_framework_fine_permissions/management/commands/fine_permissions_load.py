@@ -34,6 +34,17 @@ class Command(BaseCommand):
             except ObjectDoesNotExist as e:
                 raise CommandError("This user doesn't exist in the database")
 
+        def add_permissions(user_field_permissions, content_type, name):
+
+            p = None
+            try:
+                p = FieldPermission.objects.get(content_type=content_type, name=name)
+            except ObjectDoesNotExist:
+                p = FieldPermission(content_type=content_type, name=name)
+                p.save()
+            finally:
+                user_field_permissions.permissions.add(p)
+
 
 
         if len(args) !=1:
@@ -53,8 +64,9 @@ class Command(BaseCommand):
 
                     for f in fields_permissions:
                         content_type = ContentType.objects.get(app_label=f["app_label"], model=f["model"])
-                        p = FieldPermission.objects.get(content_type=content_type, name=f['name'])
-                        user_field_permissions.permissions.add(p)
+                        add_permissions(user_field_permissions, content_type, f['name'])
+
+
             except Exception as e:
                 raise CommandError(e)
 
