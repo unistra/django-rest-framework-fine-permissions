@@ -33,8 +33,10 @@ class UserFieldPermissionsForm(forms.ModelForm):
         super(UserFieldPermissionsForm, self).__init__(*args, **kwargs)
 
         # Choices
-        choice_str = lambda app, model, sep:\
-            '{0[0]}{1}{0[1]}{1}{2}'.format(app.split('.'), sep, model)
+        choice_str = lambda model, field, sep:\
+            '{model[0]}{sep}{model[1]}{sep}{field}'\
+                .format(model=model.split('.'), field=field, sep=sep)
+
         choices = []
         for model, fields in get_field_permissions().items():
             choices += [(choice_str(model, field, '.'), choice_str(model, field, ' | '))
