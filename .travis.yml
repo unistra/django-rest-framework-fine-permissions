@@ -1,0 +1,12 @@
+language: python
+python: "2.7"
+env:
+- TOX_ENV=py27-dj17-drf3
+- TOX_ENV=py33-dj17-drf3
+- TOX_ENV=py34-dj17-drf3
+install:
+ - pip install tox --use-mirrors
+script: tox -e $TOX_ENV
+after_success:
+ - pip install coveralls
+ - coveralls
