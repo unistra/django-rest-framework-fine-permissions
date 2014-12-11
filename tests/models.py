@@ -1,8 +1,8 @@
-from  django.db import models
+from django.db import models
 
 class Account(models.Model):
 
-    user = models.ForeignKey('auth.User')
+    user = models.OneToOneField('auth.User')
     expired_date = models.DateTimeField()
 
     @property
@@ -12,3 +12,8 @@ class Account(models.Model):
     def is_expired(self):
         from datetime import datetime
         return self.expired_date > datetime.now()
+
+
+class Card(models.Model):
+
+    account = models.ForeignKey(Account, related_name='cards')
