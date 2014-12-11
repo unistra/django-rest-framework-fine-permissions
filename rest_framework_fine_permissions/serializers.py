@@ -3,67 +3,91 @@
 """
 """
 
+from collections import OrderedDict
 from rest_framework import serializers
+from rest_framework.utils.field_mapping import get_relation_kwargs
 from .models import FieldPermission
 
 
-class NestedModelPermissionsSerializerOptions(serializers.ModelSerializerOptions):
-    """
-    """
-
-    def __init__(self, meta):
-        super(NestedModelPermissionsSerializerOptions, self).__init__(meta)
-        try:
-            self.nested_fields_default = getattr(meta, 'nested_fields_default')
-        except AttributeError:
-            self.nested_fields_default = []
-
-
 class ModelPermissionsSerializer(serializers.ModelSerializer):
-    """
-    """
 
-    _options_class = NestedModelPermissionsSerializerOptions
+    """ Permission on serializer's fields for an authenticated user. """
 
     def __init__(self, *args, **kwargs):
+        """ Check context to retrive authenticated user. """
         super(ModelPermissionsSerializer, self).__init__(*args, **kwargs)
+        # in case of a nested relation, we check context in meta options
+        # of the nested class and set this for context
+        # otherwise, the context is defined by the inherited serializer class.
+        if not self.context:
+            self._context = getattr(self.Meta, 'nested_context', {})
+        self.user = self.context['request'].user
 
-        user = self.context['request'].user
-        model_name = self.opts.model.__name__.lower()
+    def get_user_allowed_fields(self):
+        """ Retrieve all allowed field names ofr authenticated user. """
+        model_name = self.Meta.model.__name__.lower()
+        return FieldPermission.objects.filter(
+            user_field_permissions__user=self.user,
+            content_type__model=model_name
+        )
 
-        if user.is_anonymous():
-            allowed = set()
-        elif user.is_superuser:
-            allowed = FieldPermission.objects.filter(
-                content_type__model=model_name)
-        else:
-            allowed = FieldPermission.objects.filter(
-                user_field_permissions__user=user,
-                content_type__model=model_name)
-        allowed = set(allowed.values_list('name', flat=True))
-        existing = set(self.fields.keys())
+    def get_fields(self):
+        """ Calculate fields that can be accessed by authenticated user. """
+        ret = OrderedDict()
 
-        for field_name in existing - allowed:
-            self.fields.pop(field_name)
+        # no rights to see anything
+        if self.user.is_anonymous():
+            return ret
 
-    def get_nested_field(self, model_field, related_model, to_many):
-        """
-        """
+        # all fields that can be accessed through serializer
+        fields = super(ModelPermissionsSerializer, self).get_fields()
 
-        class NestedModelPermissionsSerializer(ModelPermissionsSerializer):
+        # superuser can see all the fields
+        if self.user.is_superuser:
+            return fields
+
+        # fields that can be accessed by auhtenticated user
+        allowed_fields = self.get_user_allowed_fields()
+        for allowed_field in allowed_fields:
+            field = fields[allowed_field.name]
+
+            # subfields are NestedModelSerializer
+            if isinstance(field, ModelPermissionsSerializer):
+                # no rights on subfield's fields
+                # calculate how the relation should be retrieved
+                if not field.get_fields():
+                    field_cls = field._related_class
+                    kwargs = get_relation_kwargs(allowed_field.name,
+                                                 field.info)
+                    if not issubclass(field_cls,
+                                      serializers.HyperlinkedRelatedField):
+                        kwargs.pop('view_name', None)
+                    field = field_cls(**kwargs)
+
+            ret[allowed_field.name] = field
+        return ret
+
+    def _get_default_field_names(self, declared_fields, model_info):
+        """ Return default field names for serializer. """
+        return (
+            [model_info.pk.name] +
+            list(declared_fields.keys()) +
+            list(model_info.fields.keys()) +
+            list(model_info.relations.keys())
+        )
+
+    def _get_nested_class(self, nested_depth, relation_info):
+        """ Define the serializer class for a relational field. """
+        class NestedModelPermissionSerializer(ModelPermissionsSerializer):
+
+            """ Default nested class for relation. """
+
+            is_nested = True
+            info = relation_info
+
             class Meta:
-                model = related_model
-                depth = self.opts.depth - 1
-                nested_fields_default = self.opts.nested_fields_default
+                model = relation_info.related
+                depth = nested_depth - 1
+                nested_context = self.context
 
-        serializer = NestedModelPermissionsSerializer(many=to_many,
-            context=self.context)
-
-        if not serializer.fields:
-            for field_name, rel_type in self.opts.nested_fields_default:
-                if field_name == model_field.name:
-                    return rel_type(many=to_many)
-
-            return serializers.RelatedField(many=to_many)
-
-        return serializer
+        return NestedModelPermissionSerializer

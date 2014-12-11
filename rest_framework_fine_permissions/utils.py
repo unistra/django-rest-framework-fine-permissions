@@ -7,6 +7,9 @@ import inspect
 
 from django.conf import settings
 from django.utils.importlib import import_module
+from rest_framework.utils.model_meta import get_field_info
+from six import iterkeys
+from itertools import chain
 
 
 def inherits_modelpermissions_serializer(cls):
@@ -18,11 +21,16 @@ def inherits_modelpermissions_serializer(cls):
     return inspect.isclass(cls) and is_serializer(cls) and is_modelperms(cls)
 
 
-def get_permitted_fields(model, serializer):
-    fields = [field.name for field in model._meta.fields]
-    permissions = list(serializer.base_fields.keys())
+def get_model_fields(model):
+    fields_info = get_field_info(model)
+    return chain(iterkeys(fields_info.fields_and_pk),
+                 iterkeys(fields_info.relations))
 
-    return set(fields + permissions)
+
+def get_permitted_fields(model, serializer):
+    fields = get_model_fields(model)
+    permissions = iterkeys(serializer._declared_fields)
+    return set(chain(fields, permissions))
 
 
 def get_field_permissions():
