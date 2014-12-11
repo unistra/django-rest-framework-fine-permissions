@@ -4,8 +4,9 @@ django-rest-framework-fine-permissions
 New permissions possibilities for rest-framework
 
 Now works with :
-- Django 1.6 & 1.7
-- Django Rest Framework >= 3.0
+
+  * Django 1.6 & 1.7
+  * Django Rest Framework >= 3.0
 
 .. image:: https://travis-ci.org/unistra/django-rest-framework-fine-permissions.svg?branch=drf3
     :target: https://travis-ci.org/unistra/django-rest-framework-fine-permissions
