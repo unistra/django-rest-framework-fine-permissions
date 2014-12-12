@@ -4,6 +4,9 @@ env:
 - TOX_ENV=py27-dj17-drf3
 - TOX_ENV=py33-dj17-drf3
 - TOX_ENV=py34-dj17-drf3
+- TOX_ENV=py27-dj16-drf3
+- TOX_ENV=py33-dj16-drf3
+- TOX_ENV=py34-dj16-drf3
 install:
  - pip install tox --use-mirrors
 script: tox -e $TOX_ENV
