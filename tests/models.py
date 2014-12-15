@@ -13,7 +13,12 @@ class Account(models.Model):
         from datetime import datetime
         return self.expired_date > datetime.now()
 
+class Service(models.Model):
+
+    name = models.CharField(max_length=100)
 
 class Card(models.Model):
 
     account = models.ForeignKey(Account, related_name='cards')
+    services = models.ManyToManyField(Service, related_name='+')
+

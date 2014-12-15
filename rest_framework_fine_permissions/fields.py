@@ -4,30 +4,31 @@
 """
 
 from rest_framework.fields import is_simple_callable
-from rest_framework.serializers import Field
+from rest_framework.fields import Field
 
 
 class ModelPermissionsField(Field):
     """
     """
 
-    def __init__(self, serializer, field=''):
+    def __init__(self, serializer, field='', **kwargs):
         self.serializer = serializer
         self.field = field
-        super(ModelPermissionsField, self).__init__()
+        super(ModelPermissionsField, self).__init__(**kwargs)
 
-    def field_to_native(self, obj, field_name):
-        data = ''
-        try:
-            attr = getattr(obj, self.field or field_name)
+    def _get_serializer(self, attr):
+        many = hasattr(attr, '__iter__') and not isinstance(attr, dict)
+        return self.serializer(attr, context=self.context, many=many)
 
-            if is_simple_callable(getattr(attr, 'all', None)):
-                attr = attr.all()
+    def to_representation(self, obj):
+        attr = getattr(obj, self.field or self.field_name, None)
 
-            many = hasattr(attr, '__iter__') and not isinstance(attr, dict)
-            context = {'request': self.context.get('request')}
-            serialized = self.serializer(attr, context=context, many=many)
-            data = serialized.data
-        except AttributeError:
-            pass
-        return self.to_native(data)
+        assert attr is not None, (
+            "Bad configuration for field %s, "
+            "model %s doesn't have a field with this name" %
+            (self.field_name, self.parent.Meta.model.__name__))
+
+        if is_simple_callable(getattr(attr, 'all', None)):
+            attr = attr.all()
+
+        return self._get_serializer(attr).data

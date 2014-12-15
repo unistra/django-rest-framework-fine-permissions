@@ -7,6 +7,7 @@ from collections import OrderedDict
 from rest_framework import serializers
 from rest_framework.utils.field_mapping import get_relation_kwargs
 from .models import FieldPermission
+from .fields import ModelPermissionsField
 
 
 class ModelPermissionsSerializer(serializers.ModelSerializer):
@@ -21,9 +22,12 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
         # otherwise, the context is defined by the inherited serializer class.
         if not self.context:
             self._context = getattr(self.Meta, 'nested_context', {})
-        self.user = self.context['request'].user
+        try:
+            self.user = self.context['request'].user
+        except KeyError:
+            self.user = None
 
-    def get_user_allowed_fields(self):
+    def _get_user_allowed_fields(self):
         """ Retrieve all allowed field names ofr authenticated user. """
         model_name = self.Meta.model.__name__.lower()
         return FieldPermission.objects.filter(
@@ -36,7 +40,7 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
         ret = OrderedDict()
 
         # no rights to see anything
-        if self.user.is_anonymous():
+        if not self.user:
             return ret
 
         # all fields that can be accessed through serializer
@@ -47,7 +51,7 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
             return fields
 
         # fields that can be accessed by auhtenticated user
-        allowed_fields = self.get_user_allowed_fields()
+        allowed_fields = self._get_user_allowed_fields()
         for allowed_field in allowed_fields:
             field = fields[allowed_field.name]
 
@@ -63,6 +67,9 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
                                       serializers.HyperlinkedRelatedField):
                         kwargs.pop('view_name', None)
                     field = field_cls(**kwargs)
+
+            if isinstance(field, ModelPermissionsField):
+                field.bind(allowed_field.name, self)
 
             ret[allowed_field.name] = field
         return ret
