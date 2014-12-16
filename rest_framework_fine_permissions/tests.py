@@ -2,6 +2,17 @@ import unittest
 from django.db.models import Q
 from rest_framework_fine_permissions.serializers import QSerializer
 import datetime
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from rest_framework_fine_permissions.models import FilterPermissionModel
+
+"""
+
+Run this test under a django application, with the following command :
+
+python manage.py test rest_framework_fine_permissions
+
+"""
 
 
 class TestQSerializer(unittest.TestCase):
@@ -33,5 +44,26 @@ class TestQSerializer(unittest.TestCase):
         loads = qserializer2.loads(dumps)
         self.assertEqual(loads.__str__(), self.q1.__str__())
 
-if __name__ == '__main__':
-    unittest.main()
+
+class TestFilterPermissionModel(unittest.TestCase):
+    """
+    test the filter permissions model
+    """
+
+    def setUp(self):
+        self.me = User.objects.create(username="morgan", password='morgan')
+        self.user1 = User.objects.create(username="arthur", password='arthur')
+        self.user2 = User.objects.create(username="jean", password='jean')
+        self.user_ct = ContentType.objects.get_by_natural_key("auth", "user")
+        self.q = Q(Q(username='arthur') | Q(username='jean'))
+        self.qserializer = QSerializer()
+        self.myfilter = self.qserializer.dumps(self.q)
+
+    def test_create(self):
+        fp = FilterPermissionModel.objects.create(user=self.me,
+                                                  content_type=self.user_ct,
+                                                  filter=self.myfilter)
+        self.assertEqual(fp.user.username, 'morgan')
+        self.assertEqual(fp.content_type.name, 'user')
+        self.assertEqual(fp.filter, self.myfilter)
+
