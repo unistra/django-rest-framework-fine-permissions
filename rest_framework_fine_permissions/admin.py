@@ -87,12 +87,19 @@ class UserFieldPermissionsAdmin(admin.ModelAdmin):
     form = UserFieldPermissionsForm
 
 
+class ContentTypeChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s | %s" % (obj.app_label, obj.model)
+
+
+
 class UserFilterPermissionsForm(forms.ModelForm):
     """
     filter permissions form
     """
 
     current_filter = forms.CharField(required=False)
+    content_type = ContentTypeChoiceField(queryset=ContentType.objects.all().order_by('app_label', 'model'))
 
     class Meta:
         model = FilterPermissionModel
