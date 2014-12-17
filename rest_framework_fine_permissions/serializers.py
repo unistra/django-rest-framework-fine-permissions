@@ -174,10 +174,13 @@ class QSerializer(object):
         return string
 
     def loads(self, string, raw=False):
+        encoding = 'utf-8'
+        if isinstance(string, str):
+            encoding = None
         if self.b64_enabled:
-            d = msgpack.loads(base64.b64decode(string), encoding='utf-8')
+            d = msgpack.loads(base64.b64decode(string), encoding=encoding)
         else:
-            d = msgpack.loads(string, encoding='utf-8')
+            d = msgpack.loads(string, encoding=encoding)
         if raw:
             return d
         return self.deserialize(d)
