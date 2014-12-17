@@ -92,7 +92,7 @@ class UserFilterPermissionsForm(forms.ModelForm):
     filter permissions form
     """
 
-    current_filter = forms.CharField()
+    current_filter = forms.CharField(required=False)
 
     class Meta:
         model = FilterPermissionModel
@@ -102,10 +102,9 @@ class UserFilterPermissionsForm(forms.ModelForm):
 
         # Initial datas
         instance = kwargs.get('instance')
+        self.fields['current_filter'].widget.attrs['readonly'] = True
+        self.fields['current_filter'].widget.attrs['size'] = 130
         if instance:
-            print(instance.filter)
-            self.fields['current_filter'].widget.attrs['readonly'] = True
-            self.fields['current_filter'].widget.attrs['size'] = 130
             self.initial['current_filter'] = QSerializer().loads(instance.filter)
             self.initial['filter'] = ""
 

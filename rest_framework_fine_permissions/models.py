@@ -39,7 +39,7 @@ class UserFieldPermissions(models.Model):
 
 
 class FilterPermissionModel(models.Model):
-    user = models.OneToOneField(User)
+    user = models.ForeignKey(User)
     content_type = models.ForeignKey(ContentType)
     filter = models.TextField()
 
