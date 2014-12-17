@@ -8,9 +8,10 @@ from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.contenttypes.models import ContentType
 
-
-from .models import FieldPermission, UserFieldPermissions
+from django.db.models import Q
+from .models import FieldPermission, UserFieldPermissions, FilterPermissionModel
 from .utils import get_field_permissions
+from .serializers import QSerializer
 
 
 class UserFieldPermissionsForm(forms.ModelForm):
@@ -85,4 +86,61 @@ class UserFieldPermissionsAdmin(admin.ModelAdmin):
     list_display = ('user', )
     form = UserFieldPermissionsForm
 
+
+class UserFilterPermissionsForm(forms.ModelForm):
+    """
+    filter permissions form
+    """
+
+    current_filter = forms.CharField()
+
+    class Meta:
+        model = FilterPermissionModel
+
+    def __init__(self, *args, **kwargs):
+        form = super(UserFilterPermissionsForm, self).__init__(*args, **kwargs)
+
+        # Initial datas
+        instance = kwargs.get('instance')
+        if instance:
+            print(instance.filter)
+            self.fields['current_filter'].widget.attrs['readonly'] = True
+            self.fields['current_filter'].widget.attrs['size'] = 130
+            self.initial['current_filter'] = QSerializer().loads(instance.filter)
+            self.initial['filter'] = ""
+
+    def clean_filter(self):
+        data = self.cleaned_data['filter']
+        if data:
+            try:
+                myq = Q(eval(data))
+            except:
+                raise Exception("filter is not a valid entry for a q object !")
+            else:
+                if isinstance(myq, Q):
+                    data = QSerializer().dumps(myq)
+                else:
+                    raise Exception("filter is not a q object !")
+
+        return data
+
+    def save(self, commit=True):
+        form = super(UserFilterPermissionsForm, self).save(commit=False)
+
+        if commit:
+            form.save()
+            form.save_m2m()
+
+        return form
+
+
+class UserFilterPermissionsAdmin(admin.ModelAdmin):
+    """
+    filter permissions admin
+    """
+    list_display = ('user', 'content_type')
+    form = UserFilterPermissionsForm
+
+
 admin.site.register(UserFieldPermissions, UserFieldPermissionsAdmin)
+admin.site.register(FilterPermissionModel, UserFilterPermissionsAdmin)
