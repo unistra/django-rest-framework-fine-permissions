@@ -41,7 +41,7 @@ class UserFieldPermissions(models.Model):
 class FilterPermissionModel(models.Model):
     user = models.OneToOneField(User)
     content_type = models.ForeignKey(ContentType)
-    filter = models.BinaryField()
+    filter = models.TextField()
 
     class Meta:
         verbose_name = _('user filter permission')

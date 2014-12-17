@@ -12,7 +12,7 @@ class FilterPermissionManager(Manager):
     """
 
     def __init__(self, user, model):
-        super().__init__()
+        super(FilterPermissionManager, self).__init__()
         self.user = user
         self.model = model
 
@@ -28,4 +28,4 @@ class FilterPermissionManager(Manager):
             except ObjectDoesNotExist:
                 pass
 
-        return super().get_queryset().filter(myfilter)
+        return super(FilterPermissionManager, self).get_queryset().filter(myfilter)

@@ -5,7 +5,6 @@
 
 from rest_framework.permissions import DjangoModelPermissions, BasePermission
 from django.contrib.contenttypes.models import ContentType
-import re
 from rest_framework_fine_permissions.models import FilterPermissionModel
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework_fine_permissions.serializers import QSerializer

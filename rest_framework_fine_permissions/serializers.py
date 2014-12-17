@@ -11,6 +11,7 @@ import time
 from django.db.models import Q
 from django.core.serializers.base import SerializationError
 import msgpack
+import six
 
 
 class NestedModelPermissionsSerializerOptions(serializers.ModelSerializerOptions):
@@ -79,7 +80,7 @@ class QSerializer(object):
     """
     A Q object serializer base class. Use msgpack.
     """
-    b64_enabled = False
+    b64_enabled = True
 
     def __init__(self, base64=False):
         if base64:
@@ -170,13 +171,13 @@ class QSerializer(object):
             raise SerializationError
         string = msgpack.dumps(self.serialize(obj), default=self.dt2ts)
         if self.b64_enabled:
-            return base64.b64encode(string)
+            return base64.b64encode(string).decode('utf-8')
         return string
 
     def loads(self, string, raw=False):
-        encoding = 'utf-8'
-        if isinstance(string, str):
-            encoding = None
+        encoding = None
+        if six.PY3:
+            encoding = 'utf-8'
         if self.b64_enabled:
             d = msgpack.loads(base64.b64decode(string), encoding=encoding)
         else:
