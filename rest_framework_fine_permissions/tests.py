@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework_fine_permissions.models import FilterPermissionModel
 from rest_framework_fine_permissions.permissions import FilterPermission
 from django.http import HttpRequest
-from rest_framework_fine_permissions.managers import FilterPermissionManager
+from rest_framework_fine_permissions.filters import FilterPermissionBackend
 
 """
 
@@ -112,9 +112,50 @@ class TestFilterPermission(TestCase):
         self.assertFalse(res)
 
 
-class TestFilterPermissionManager(TestCase):
+# class TestFilterPermissionManager(TestCase):
+#     """
+#     test manager
+#     """
+
+#     def setUp(self):
+#         self.filterperm = FilterPermission()
+#         self.me = User.objects.create(username="morgan", password='morgan')
+#         self.userok = User.objects.create(username="arthur", password='arthur')
+#         self.not_admin = User.objects.create(username="jean", password='jean')
+#         self.wrong = User.objects.create(username="jojo", password='jojo')
+#         self.admin = User.objects.create_superuser(username="admin", password="admin", email="")
+#         self.user_ct = ContentType.objects.get_by_natural_key("auth", "user")
+#         self.q = Q(Q(username='arthur') | Q(username='jean'))
+#         self.qserializer = QSerializer()
+#         self.myfilter = self.qserializer.dumps(self.q)
+#         self.fpm = FilterPermissionModel.objects.create(user=self.me,
+#                                                         content_type=self.user_ct,
+#                                                         filter=self.myfilter)
+#         self.manager = FilterPermissionManager(user=self.me,model=User)
+
+
+#     def test_manager_valid(self):
+#         self.assertEqual(len(self.manager.all()), 2)
+#         self.assertEqual(self.manager.get(username='arthur'), self.userok)
+
+#     def test_manager_not_valid(self):
+#         self.assertEqual(len(self.manager.all()), 2)
+#         with self.assertRaises(User.DoesNotExist):
+#             self.manager.get(username='jojo')
+
+#     def test_superuser(self):
+#         self.manager = FilterPermissionManager(user=self.admin,model=User)
+#         self.assertEqual(len(self.manager.all()), 5)
+
+
+#     def test_no_filter(self):
+#         self.manager = FilterPermissionManager(user=self.not_admin,model=User)
+#         self.assertEqual(len(self.manager.all()), 5)
+
+
+class TestFilterPermissionFilter(TestCase):
     """
-    test manager
+    test filter
     """
 
     def setUp(self):
@@ -131,24 +172,29 @@ class TestFilterPermissionManager(TestCase):
         self.fpm = FilterPermissionModel.objects.create(user=self.me,
                                                         content_type=self.user_ct,
                                                         filter=self.myfilter)
-        self.manager = FilterPermissionManager(user=self.me,model=User)
+        self.request = HttpRequest()
+        self.request.user = self.me
+        self.queryset = User.objects.all()
+        self.filterbackend = FilterPermissionBackend()
 
 
     def test_manager_valid(self):
-        self.assertEqual(len(self.manager.all()), 2)
-        self.assertEqual(self.manager.get(username='arthur'), self.userok)
+        filter = self.filterbackend.filter_queryset(self.request, self.queryset, None)
+        self.assertEqual(len(filter.all()), 2)
+        self.assertEqual(filter.get(username='arthur'), self.userok)
 
     def test_manager_not_valid(self):
-        self.assertEqual(len(self.manager.all()), 2)
+        filter = self.filterbackend.filter_queryset(self.request, self.queryset, None)
+        self.assertEqual(len(filter.all()), 2)
         with self.assertRaises(User.DoesNotExist):
-            self.manager.get(username='jojo')
+            filter.get(username='jojo')
 
     def test_superuser(self):
-        self.manager = FilterPermissionManager(user=self.admin,model=User)
-        self.assertEqual(len(self.manager.all()), 5)
-
+        self.request.user = self.admin
+        filter = self.filterbackend.filter_queryset(self.request, self.queryset, None)
+        self.assertEqual(len(filter.all()), 5)
 
     def test_no_filter(self):
-        self.manager = FilterPermissionManager(user=self.not_admin,model=User)
-        self.assertEqual(len(self.manager.all()), 5)
-
+        self.request.user = self.not_admin
+        filter = self.filterbackend.filter_queryset(self.request, self.queryset, None)
+        self.assertEqual(len(filter.all()), 5)
