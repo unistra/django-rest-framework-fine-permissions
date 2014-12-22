@@ -15,18 +15,16 @@ class FilterPermissionBackend(BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         user = request.user
-        if queryset:
-            model = queryset.model
-            myfilter = Q()
-            if not user.is_superuser:
-                try:
-                    ct = ContentType.objects.get_for_model(model)
-                    fpm = FilterPermissionModel.objects.get(user=user,
-                                                            content_type=ct)
-                    myfilter = QSerializer(base64=True).loads(fpm.filter)
-                except ObjectDoesNotExist:
-                    pass
-            return queryset.filter(myfilter)
-        else:
-            return queryset
+        model = queryset.model
+        myfilter = Q()
+        if not user.is_superuser:
+            try:
+                ct = ContentType.objects.get_for_model(model)
+                fpm = FilterPermissionModel.objects.get(user=user,
+                                                        content_type=ct)
+                myfilter = QSerializer(base64=True).loads(fpm.filter)
+            except ObjectDoesNotExist:
+                pass
+        return queryset.filter(myfilter)
+
 
