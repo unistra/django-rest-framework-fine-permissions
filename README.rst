@@ -34,6 +34,7 @@ Configure the "filter permissions" module in your rest framework settings: ::
         ),
 
         'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework_fine_permissions.permissions.FullDjangoModelPermissions',
             'rest_framework_fine_permissions.permissions.FilterPermission',
         )
     }
