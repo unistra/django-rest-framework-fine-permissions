@@ -129,12 +129,12 @@ class UserFilterPermissionsForm(forms.ModelForm):
             try:
                 myq = QSerializer().loads(data)
             except:
-                raise Exception("filter is not a valid entry for a q object !")
+                raise forms.ValidationError("filter is not a valid entry for a q object !")
             else:
                 if isinstance(myq, Q):
                     data = QSerializer(base64=True).dumps(myq)
                 else:
-                    raise Exception("filter is not a q object !")
+                    raise forms.ValidationError("filter is not a q object !")
 
         return data
 
