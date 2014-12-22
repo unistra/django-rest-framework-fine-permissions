@@ -10,7 +10,7 @@ import base64
 import time
 from django.db.models import Q
 from django.core.serializers.base import SerializationError
-import msgpack
+import json
 import six
 
 
@@ -76,9 +76,9 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
         return serializer
 
 
-class QSerializer(object):
+class QSerializer():
     """
-    A Q object serializer base class. Use msgpack.
+    A Q object serializer base class. Use json.
     """
     b64_enabled = True
 
@@ -134,54 +134,25 @@ class QSerializer(object):
             query.subtree_parents = d['subtree_parents']
         return query
 
-    def get_field_values_list(self, d):
-        """
-        Iterate over a (possibly nested) dict, and return a list
-        of all children queries, as a dict of the following structure:
-        {
-            'field': 'some_field__iexact',
-            'value': 'some_value',
-            'value_from': 'optional_range_val1',
-            'value_to': 'optional_range_val2',
-            'negate': True,
-        }
-
-        OR relations are expressed as an extra "line" between queries.
-        """
-        fields = []
-        children = d.get('children', [])
-        for child in children:
-            if isinstance(child, dict):
-                fields.extend(self.get_field_values_list(child))
-            else:
-                f = {'field': child[0], 'value': child[1]}
-                if self._is_range(child):
-                    f['value_from'] = child[1][0]
-                    f['value_to'] = child[1][1]
-                f['negate'] = d.get('negated', False)
-                fields.append(f)
-
-            # add _OR line
-            if d['connector'] == 'OR' and children[-1] != child:
-                fields.append({'field': '_OR', 'value': 'null'})
-        return fields
-
     def dumps(self, obj):
         if not isinstance(obj, Q):
             raise SerializationError
-        string = msgpack.dumps(self.serialize(obj), default=self.dt2ts)
+        string = json.dumps(self.serialize(obj), default=self.dt2ts)
         if self.b64_enabled:
-            return base64.b64encode(string).decode('utf-8')
+            if six.PY2:
+                return base64.b64encode(string)
+            else:
+                return base64.b64encode(string.encode('utf-8')).decode('utf-8')
         return string
 
     def loads(self, string, raw=False):
-        encoding = None
-        if six.PY3:
-            encoding = 'utf-8'
         if self.b64_enabled:
-            d = msgpack.loads(base64.b64decode(string), encoding=encoding)
+            if six.PY2:
+                d = json.loads(base64.b64decode(string))
+            else:
+                d = json.loads(base64.b64decode(string).decode('utf-8'))
         else:
-            d = msgpack.loads(string, encoding=encoding)
+            d = json.loads(string)
         if raw:
             return d
         return self.deserialize(d)
