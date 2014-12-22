@@ -11,7 +11,6 @@ import time
 from django.db.models import Q
 from django.core.serializers.base import SerializationError
 import json
-import six
 
 
 class NestedModelPermissionsSerializerOptions(serializers.ModelSerializerOptions):
