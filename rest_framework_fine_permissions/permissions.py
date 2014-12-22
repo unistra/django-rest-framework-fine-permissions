@@ -51,7 +51,7 @@ class FilterPermission(BasePermission):
                 ct = ContentType.objects.get_for_model(obj)
                 fpm = FilterPermissionModel.objects.get(user=user,
                                                         content_type=ct)
-                myq = QSerializer().loads(fpm.filter)
+                myq = QSerializer(base64=True).loads(fpm.filter)
                 try:
                     myobj = obj.__class__.objects.filter(myq).get(pk=obj.pk)
                     if myobj:

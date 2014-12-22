@@ -111,20 +111,28 @@ class UserFilterPermissionsForm(forms.ModelForm):
         instance = kwargs.get('instance')
         self.fields['current_filter'].widget.attrs['readonly'] = True
         self.fields['current_filter'].widget.attrs['size'] = 130
+
         if instance:
-            self.initial['current_filter'] = QSerializer().loads(instance.filter)
-            self.initial['filter'] = ""
+            myq = QSerializer(base64=True).loads(instance.filter)
+            current_filter = myq.__str__()
+        else:
+            myq = Q(myfield="myvalue")
+            current_filter = ""
+
+        self.initial['current_filter'] = current_filter
+        self.initial['filter'] = QSerializer().dumps(myq)
+
 
     def clean_filter(self):
         data = self.cleaned_data['filter']
         if data:
             try:
-                myq = Q(eval(data))
+                myq = QSerializer().loads(data)
             except:
                 raise Exception("filter is not a valid entry for a q object !")
             else:
                 if isinstance(myq, Q):
-                    data = QSerializer().dumps(myq)
+                    data = QSerializer(base64=True).dumps(myq)
                 else:
                     raise Exception("filter is not a q object !")
 

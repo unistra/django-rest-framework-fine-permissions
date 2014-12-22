@@ -31,7 +31,7 @@ class TestQSerializer(TestCase):
                     Q(Q(field3="test3") |
                       Q(field3__range=(datetime.datetime(2005, 1, 1),
                                        datetime.datetime(2005, 3, 31)))))
-        self.qserializer = QSerializer()
+        self.qserializer = QSerializer(base64=True)
         self.dumps = self.qserializer.dumps(self.q1)
 
     def test_dumps(self):
@@ -46,7 +46,7 @@ class TestQSerializer(TestCase):
     def test_dumps_and_loads_with_other_instance(self):
         dumps = self.qserializer.dumps(self.q1)
         self.assertEqual(dumps, self.dumps)
-        qserializer2 = QSerializer()
+        qserializer2 = QSerializer(base64=True)
         loads = qserializer2.loads(dumps)
         self.assertEqual(qserializer2.serialize(loads),
                          qserializer2.serialize(self.q1))
@@ -60,7 +60,7 @@ class TestFilterPermissionModel(TestCase):
     def setUp(self):
         self.me = User.objects.create(username="morgan", password='morgan')        
         self.q = Q(Q(username='arthur') | Q(username='jean'))
-        self.qserializer = QSerializer()
+        self.qserializer = QSerializer(base64=True)
         self.myfilter = self.qserializer.dumps(self.q)
         self.user_ct = ContentType.objects.get_by_natural_key("auth", "user")
 
@@ -88,7 +88,7 @@ class TestFilterPermission(TestCase):
         self.admin = User.objects.create_superuser(username="admin", password="admin", email="")
         self.user_ct = ContentType.objects.get_by_natural_key("auth", "user")
         self.q = Q(Q(username='arthur') | Q(username='jean'))
-        self.qserializer = QSerializer()
+        self.qserializer = QSerializer(base64=True)
         self.myfilter = self.qserializer.dumps(self.q)
         self.fpm = FilterPermissionModel.objects.create(user=self.me,
                                                         content_type=self.user_ct,
@@ -130,7 +130,7 @@ class TestFilterPermissionFilter(TestCase):
         self.admin = User.objects.create_superuser(username="admin", password="admin", email="")
         self.user_ct = ContentType.objects.get_by_natural_key("auth", "user")
         self.q = Q(Q(username='arthur') | Q(username='jean'))
-        self.qserializer = QSerializer()
+        self.qserializer = QSerializer(base64=True)
         self.myfilter = self.qserializer.dumps(self.q)
         self.fpm = FilterPermissionModel.objects.create(user=self.me,
                                                         content_type=self.user_ct,

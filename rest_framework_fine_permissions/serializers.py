@@ -80,7 +80,7 @@ class QSerializer():
     """
     A Q object serializer base class. Use json.
     """
-    b64_enabled = True
+    b64_enabled = False
 
     def __init__(self, base64=False):
         if base64:

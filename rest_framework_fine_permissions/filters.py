@@ -23,7 +23,7 @@ class FilterPermissionBackend(BaseFilterBackend):
                     ct = ContentType.objects.get_for_model(model)
                     fpm = FilterPermissionModel.objects.get(user=user,
                                                             content_type=ct)
-                    myfilter = QSerializer().loads(fpm.filter)
+                    myfilter = QSerializer(base64=True).loads(fpm.filter)
                 except ObjectDoesNotExist:
                     pass
             return queryset.filter(myfilter)
