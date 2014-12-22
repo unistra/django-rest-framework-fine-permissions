@@ -7,6 +7,7 @@ Compatibility
 -------------
 
 work with :
+ * Python 2.7 / Python 3.4
  * Dango 1.6
  * Django Rest Framework < 2.4
 
