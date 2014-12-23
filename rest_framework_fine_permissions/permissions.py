@@ -45,7 +45,7 @@ class FilterPermission(BasePermission):
 
         user = request.user
 
-        if not user.is_superuser:
+        if not user.is_superuser and not user.is_anonymous():
             valid = False
             try:
                 ct = ContentType.objects.get_for_model(obj)
