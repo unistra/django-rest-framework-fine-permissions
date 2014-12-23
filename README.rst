@@ -26,18 +26,24 @@ Sync the django's database: ::
 
     python manage.py syncdb
 
-Configure the "filter permissions" module in your rest framework settings: ::
+Configure your rest framework : ::
 
     REST_FRAMEWORK = {
         'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_fine_permissions.filters.FilterPermissionBackend',
+            # Enable the filter permission backend for all GenericAPIView
+            'rest_framework_fine_permissions.filters.FilterPermissionBackend',
         ),
 
         'DEFAULT_PERMISSION_CLASSES': (
+            # Enable the django model permissions (view,create,delete,modify)
             'rest_framework_fine_permissions.permissions.FullDjangoModelPermissions',
+            # OPTIONAL if you use FilterPermissionBackend and GenericAPIView. Check filter permissions for objects.
             'rest_framework_fine_permissions.permissions.FilterPermission',
         )
     }
+
+
+
 
 Usage
 -----
