@@ -53,7 +53,7 @@ class FilterPermission(BasePermission):
                                                         content_type=ct)
                 myq = QSerializer(base64=True).loads(fpm.filter)
                 try:
-                    myobj = obj.__class__.objects.filter(myq).get(pk=obj.pk)
+                    myobj = obj.__class__.objects.filter(myq).distinct().get(pk=obj.pk)
                     if myobj:
                         valid = True
                 except ObjectDoesNotExist:
