@@ -122,6 +122,8 @@ class UserFilterPermissionsForm(forms.ModelForm):
         self.initial['current_filter'] = current_filter
         self.initial['filter'] = QSerializer().dumps(myq)
 
+        self.fields['filter'].widget.attrs['rows'] = len(self.initial['filter'].splitlines()) + 4
+
 
     def clean_filter(self):
         data = self.cleaned_data['filter']

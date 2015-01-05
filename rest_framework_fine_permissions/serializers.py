@@ -136,7 +136,9 @@ class QSerializer():
     def dumps(self, obj):
         if not isinstance(obj, Q):
             raise SerializationError
-        string = json.dumps(self.serialize(obj), default=self.dt2ts)
+        string = json.dumps(self.serialize(obj), default=self.dt2ts,
+                            sort_keys=True,
+                            indent=4, separators=(',', ': '))
         if self.b64_enabled:
             return base64.b64encode(string.encode('utf-8')).decode('utf-8')
         return string
