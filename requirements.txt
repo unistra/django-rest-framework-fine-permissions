@@ -1,3 +1,2 @@
 djangorestframework==3.0
 six
-django==1.7

@@ -36,3 +36,19 @@ class UserFieldPermissions(models.Model):
 
     def __unicode__(self):
         return self.user.username
+
+
+class FilterPermissionModel(models.Model):
+    user = models.ForeignKey(User)
+    content_type = models.ForeignKey(ContentType)
+    filter = models.TextField()
+
+    class Meta:
+        verbose_name = _('user filter permission')
+        verbose_name_plural = _('user filters permissions')
+        db_table = 'drf_user_filter_permissions'
+        unique_together = ('user', 'content_type',)
+
+    def __unicode__(self):
+        return '{0.content_type.app_label} | {0.content_type.model} | {0.user.username} | {0.filter}'\
+            .format(self)
