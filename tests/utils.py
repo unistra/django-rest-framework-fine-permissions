@@ -20,6 +20,7 @@ def create_card(account):
     """ Create a card for tests. """
     return Card.objects.create(account=account)
 
+
 def create_service(name):
     """ Create a service for tests. """
     return Service.objects.create(name=name)

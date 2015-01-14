@@ -31,6 +31,14 @@ class CardSerializer(serializers.ModelPermissionsSerializer):
     class Meta:
         model = Card
 
+class AnotherCardSerializer(serializers.ModelPermissionsSerializer):
+
+    account = fields.ModelPermissionsField(AccountSerializer)
+    service_names = fields.ModelPermissionsField('tests.ServiceSerializer', field='services')
+
+    class Meta:
+        model = Card
+
 class BadCardSerializer(serializers.ModelPermissionsSerializer):
 
     account_name = fields.ModelPermissionsField(AccountSerializer)

@@ -89,7 +89,6 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
 
             """ Default nested class for relation. """
 
-            is_nested = True
             info = relation_info
 
             class Meta:

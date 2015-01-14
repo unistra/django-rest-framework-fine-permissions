@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.http import HttpRequest
+from rest_framework_fine_permissions.fields import get_serializer
 
 from . import serializers
 from . import utils
@@ -87,3 +88,33 @@ class TestModelFieldPermissions(TestCase):
             "for field account_name, model Card doesn't have a field",
             mpf.to_representation,
             self.card)
+
+    def test_defined_with_no_dependency(self):
+        """ Test with serializer passed as a string. """
+        self._add_field_perms('tests', 'card', 'account', 'service_names')
+        self.Serializer = serializers.AnotherCardSerializer
+
+        ser = self._get_serializer_instance()
+        service_names = ser.get_fields()['service_names']
+        self.assertEqual(service_names.serializer,
+                         serializers.ServiceSerializer)
+
+
+class TestLoadSerializer(TestCase):
+
+    """ Test loading serializer from string. """
+
+    def test_direct_to_serializer(self):
+        """ Test with no operation to do. """
+        ser = get_serializer(serializers.AccountSerializer)
+        self.assertEqual(ser, serializers.AccountSerializer)
+
+    def test_serializer_found(self):
+        """ Test founding a serializer from an app label and his name. """
+        ser = get_serializer('tests.AccountSerializer')
+        self.assertEqual(ser, serializers.AccountSerializer)
+
+    def test_serializer_not_found(self):
+        """ Test not founding a serializer from an app label and his name. """
+        ser = get_serializer('notests.AccountSerializer')
+        self.assertIsNone(ser)
