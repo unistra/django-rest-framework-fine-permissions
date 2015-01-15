@@ -15,7 +15,6 @@ from rest_framework import serializers
 from rest_framework.utils.field_mapping import get_relation_kwargs
 
 from .models import FieldPermission
-from .fields import ModelPermissionsField
 
 
 class ModelPermissionsSerializer(serializers.ModelSerializer):
@@ -75,9 +74,6 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
                                       serializers.HyperlinkedRelatedField):
                         kwargs.pop('view_name', None)
                     field = field_cls(**kwargs)
-
-            if isinstance(field, ModelPermissionsField):
-                field.bind(allowed_field.name, self)
 
             ret[allowed_field.name] = field
         return ret

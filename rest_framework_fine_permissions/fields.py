@@ -5,9 +5,11 @@
 
 import logging
 import six
+import collections
+
+from django.db import models
 from rest_framework import serializers
-from rest_framework.fields import is_simple_callable
-from rest_framework.fields import Field
+from rest_framework.fields import Field, empty
 
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ APP_NAMES = None
 
 
 def get_application(app_label):
-    """ Get application. """
+    """ Get an application. """
     try:
         # django >= 1.7
         from django.apps import apps as django_apps
@@ -29,7 +31,6 @@ def get_application(app_label):
             APP_NAMES = {
                 app.rsplit('.', 1)[-1]: app for app in settings.INSTALLED_APPS
             }
-
         return APP_NAMES[app_label]
 
 
@@ -49,34 +50,30 @@ def get_serializer(serializer):
     return serializer
 
 
-
-
 class ModelPermissionsField(Field):
-    """
-    """
 
-    def __init__(self, serializer, field='', **kwargs):
+    """ Field that acts as a ModelPermissionsSerializer for relations. """
+
+    def __init__(self, serializer, read_only=False, write_only=False,
+                 required=None, default=empty, initial=empty, source=None,
+                 label=None, help_text=None, style=None,
+                 error_messages=None, validators=None, allow_null=False):
         self.serializer = get_serializer(serializer)
         assert self.serializer is not None \
             and issubclass(self.serializer, serializers.ModelSerializer), (
                 "Bad serializer defined %s" % serializer
             )
-        self.field = field
-        super(ModelPermissionsField, self).__init__(**kwargs)
-
-    def _get_serializer(self, attr):
-        many = hasattr(attr, '__iter__') and not isinstance(attr, dict)
-        return self.serializer(attr, context=self.context, many=many)
+        super(ModelPermissionsField, self).__init__(read_only, write_only,
+                                                    required, default, initial,
+                                                    source, label, help_text,
+                                                    style, error_messages,
+                                                    validators, allow_null)
 
     def to_representation(self, obj):
-        attr = getattr(obj, self.field or self.field_name, None)
+        """ Represent data for the field. """
+        many = isinstance(obj, collections.Iterable) \
+            or isinstance(obj, models.Manager) \
+            and not isinstance(obj, dict)
 
-        assert attr is not None, (
-            "Bad configuration for field %s, "
-            "model %s doesn't have a field with this name" %
-            (self.field_name, self.parent.Meta.model.__name__))
-
-        if is_simple_callable(getattr(attr, 'all', None)):
-            attr = attr.all()
-
-        return self._get_serializer(attr).data
+        ser = self.serializer(obj, context=self.context, many=many)
+        return ser.data

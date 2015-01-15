@@ -37,27 +37,28 @@ class TestModelFieldPermissions(TestCase):
     def _auth_user(self):
         self.request.user = self.user
 
-    def _get_serializer_instance(self, anonymous=False):
+    def _get_serializer_instance(self, instance=None, anonymous=False):
         if anonymous:
-            self.Serializer(context={})
+            self.Serializer(instance=instance, context={})
         self._auth_user()
-        return self.Serializer(context={'request': self.request})
+        return self.Serializer(instance=instance,
+                               context={'request': self.request})
 
     def test_simple_data_in_permissions_field(self):
         """ Test with a many to one field. """
         self._add_field_perms('tests', 'account', 'id', 'user')
         self._add_field_perms('tests', 'card', 'account')
 
-        ser = self._get_serializer_instance()
-        mpf = ser.get_fields()['account']
+        ser = self._get_serializer_instance(instance=self.card)
 
-        representation = mpf.to_representation(self.card)
+        data = ser.data
 
-        self.assertEqual(sorted(representation), ['id', 'user'])
-        self.assertEqual(representation['id'], self.account.id)
+        self.assertEqual(sorted(data['account']), ['id', 'user'])
+        self.assertEqual(data['account']['id'], self.account.id)
 
     def test_list_data_in_permissions_field(self):
         """ Test with a many to one field. """
+        self._add_field_perms('tests', 'account', 'id', 'user')
         self._add_field_perms('tests', 'card', 'id', 'service_names')
         self._add_field_perms('tests', 'service', 'name', 'id')
 
@@ -66,28 +67,12 @@ class TestModelFieldPermissions(TestCase):
         self.card.services.add(service)
         self.card.services.add(service2)
 
-        ser = self._get_serializer_instance()
-        mpf = ser.get_fields()['service_names']
+        ser = self._get_serializer_instance(instance=self.card)
+        data = ser.data
 
-        representation = mpf.to_representation(self.card)
-
-        self.assertEqual(sorted(representation[0]), ['id', 'name'])
-        self.assertEqual(len(representation), 2)
-        self.assertEqual(representation[0]['name'], 'chronos')
-
-    def test_bad_configuration(self):
-        """ Test bad instantiation of a model permissions field. """
-        self._add_field_perms('tests', 'card', 'account_name')
-        self.Serializer = serializers.BadCardSerializer
-
-        ser = self._get_serializer_instance()
-        mpf = ser.get_fields()['account_name']
-
-        self.assertRaisesRegexp(
-            AssertionError,
-            "for field account_name, model Card doesn't have a field",
-            mpf.to_representation,
-            self.card)
+        self.assertEqual(sorted(data['service_names'][0]), ['id', 'name'])
+        self.assertEqual(len(data['service_names']), 2)
+        self.assertEqual(data['service_names'][0]['name'], 'chronos')
 
     def test_defined_with_no_dependency(self):
         """ Test with serializer passed as a string. """
