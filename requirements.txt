@@ -1,2 +1,2 @@
-djangorestframework==3.0
+djangorestframework==3.0.3
 six
