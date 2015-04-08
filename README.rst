@@ -18,6 +18,10 @@ Works with :
 .. image:: https://coveralls.io/repos/unistra/django-rest-framework-fine-permissions/badge.png?branch=drf3
     :target: https://coveralls.io/r/unistra/django-rest-framework-fine-permissions?branch=drf3
 
+.. image:: https://landscape.io/github/unistra/django-rest-framework-fine-permissions/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/unistra/django-rest-framework-fine-permissions/master
+      :alt: Code Health
+
 
 Installation
 ------------
