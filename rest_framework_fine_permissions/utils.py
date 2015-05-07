@@ -23,7 +23,7 @@ def inherits_modelpermissions_serializer(cls):
 
 def get_model_fields(model):
     fields_info = get_field_info(model)
-    return chain(iterkeys(fields_info.fields_and_pk),
+    return chain(iterkeys(fields_info.fields),
                  iterkeys(fields_info.relations))
 
 
