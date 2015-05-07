@@ -10,6 +10,7 @@ from django.utils.importlib import import_module
 from rest_framework.utils.model_meta import get_field_info
 from six import iterkeys
 from itertools import chain
+from rest_framework.compat import OrderedDict
 
 
 def inherits_modelpermissions_serializer(cls):
@@ -21,11 +22,17 @@ def inherits_modelpermissions_serializer(cls):
     return inspect.isclass(cls) and is_serializer(cls) and is_modelperms(cls)
 
 
+def merge_fields_and_pk(pk, fields):
+    fields_and_pk = OrderedDict()
+    fields_and_pk[pk.name] = pk
+    fields_and_pk.update(fields)
+    return fields_and_pk
+
 def get_model_fields(model):
     fields_info = get_field_info(model)
-    return chain(iterkeys(fields_info.fields),
+    return chain(iterkeys(merge_fields_and_pk(fields_info.pk,
+                                              fields_info.fields)),
                  iterkeys(fields_info.relations))
-
 
 def get_permitted_fields(model, serializer):
     fields = get_model_fields(model)
