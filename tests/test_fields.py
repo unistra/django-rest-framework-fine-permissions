@@ -81,8 +81,29 @@ class TestModelFieldPermissions(TestCase):
 
         ser = self._get_serializer_instance()
         service_names = ser.get_fields()['service_names']
-        self.assertEqual(service_names.serializer,
+        self.assertEqual(get_serializer(service_names.serializer),
                          serializers.ServiceSerializer)
+
+    def test_with_depth(self):
+        """ Test with a defined depth. """
+        self._add_field_perms('tests', 'card', 'id', 'account')
+        self._add_field_perms('tests', 'account', 'id', 'user', 'expired_date')
+        self._add_field_perms('auth', 'user', 'id', 'username', 'last_name')
+        
+        ser = self._get_serializer_instance(instance=self.card)
+
+        account_field_ser = ser.get_fields()['account']
+        print(account_field_ser)
+        self.assertEqual(account_field_ser.__class__.__name__,
+                         'NestedModelPermissionSerializer')
+        self.assertEqual(account_field_ser.Meta.depth, 0)
+
+        user_field_ser = account_field_ser.get_fields()['user']
+        self.assertEqual(user_field_ser.__class__.__name__,
+                         'NestedModelPermissionSerializer')
+
+        data = ser.data
+        self.assertEqual(data['account']['user'], self.account.user.id)
 
 
 class TestLoadSerializer(TestCase):

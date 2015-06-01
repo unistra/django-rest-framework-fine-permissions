@@ -14,9 +14,8 @@ class ServiceSerializer(serializers.ModelPermissionsSerializer):
 
 class AccountSerializer(serializers.ModelPermissionsSerializer):
 
-    is_expired = drf_serializers.BooleanField(source='is_expired',
-                                              read_only=True)
-    full_name = drf_serializers.CharField(source='full_name', read_only=True)
+    is_expired = drf_serializers.BooleanField(read_only=True)
+    full_name = drf_serializers.CharField(read_only=True)
 
     class Meta:
         depth = 1

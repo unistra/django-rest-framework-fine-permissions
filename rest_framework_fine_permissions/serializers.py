@@ -12,7 +12,7 @@ import time
 from django.core.serializers.base import SerializationError
 from django.db.models import Q
 from rest_framework import serializers
-from rest_framework.utils.field_mapping import get_relation_kwargs
+from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 
 from .models import FieldPermission
 
@@ -31,6 +31,13 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
             self._context = getattr(self.Meta, 'nested_context', {})
         try:
             self.user = self.context['request'].user
+            allowed = set(self._get_user_allowed_fields().values_list('name',
+                                                                  flat=True))
+            existing = set(self.fields.keys())
+
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
         except KeyError:
             self.user = None
 
@@ -42,8 +49,9 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
             content_type__model=model_name
         )
 
+    """
     def get_fields(self):
-        """ Calculate fields that can be accessed by authenticated user. """
+         Calculate fields that can be accessed by authenticated user.
         ret = OrderedDict()
 
         # no rights to see anything
@@ -79,28 +87,29 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
         return ret
 
     def _get_default_field_names(self, declared_fields, model_info):
-        """ Return default field names for serializer. """
+        Return default field names for serializer.
         return (
             [model_info.pk.name] +
             list(declared_fields.keys()) +
             list(model_info.fields.keys()) +
             list(model_info.relations.keys())
-        )
+        )"""
 
-    def _get_nested_class(self, nested_depth, relation_info):
+    def build_nested_field(self, field_name, relation_info, nested_depth):
         """ Define the serializer class for a relational field. """
+        print(field_name)
         class NestedModelPermissionSerializer(ModelPermissionsSerializer):
 
             """ Default nested class for relation. """
 
-            info = relation_info
-
             class Meta:
-                model = relation_info.related
+                model = relation_info.related_model
                 depth = nested_depth - 1
-                nested_context = self.context
 
-        return NestedModelPermissionSerializer
+        field_class = NestedModelPermissionSerializer
+        field_kwargs = get_nested_relation_kwargs(relation_info)
+
+        return field_class, field_kwargs
 
 
 class QSerializer():
