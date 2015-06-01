@@ -44,9 +44,12 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
     def _get_user_allowed_fields(self):
         """ Retrieve all allowed field names ofr authenticated user. """
         model_name = self.Meta.model.__name__.lower()
+        app_label = self.Meta.model._meta.app_label
+
         return FieldPermission.objects.filter(
             user_field_permissions__user=self.user,
-            content_type__model=model_name
+            content_type__model=model_name,
+            content_type__app_label=app_label
         )
 
     """

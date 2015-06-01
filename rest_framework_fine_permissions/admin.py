@@ -103,6 +103,7 @@ class UserFilterPermissionsForm(forms.ModelForm):
 
     class Meta:
         model = FilterPermissionModel
+        exclude = []
 
     def __init__(self, *args, **kwargs):
         form = super(UserFilterPermissionsForm, self).__init__(*args, **kwargs)

@@ -26,14 +26,14 @@ class TestUtilities(TestCase):
 
     def test_model_retrieving_model_fields(self):
         """ Test field names extracted from the model. """
-        model_fields = ('id', 'pk', 'user', 'expired_date', 'cards')
+        model_fields = ('id', 'user', 'expired_date', 'cards')
         self.assertEqual(set(utils.get_model_fields(Account)),
                          set(model_fields))
 
     def test_permitted_fields(self):
         """ Test list of fields displayed in admin interface. """
         permit_fields = utils.get_permitted_fields(Account, self.account_ser)
-        model_fields = ('id', 'pk', 'user', 'expired_date', 'cards')
+        model_fields = ('id', 'user', 'expired_date', 'cards')
         serializer_fields = ('is_expired', 'full_name')
         self.assertEqual(permit_fields, set(model_fields + serializer_fields))
 
@@ -42,5 +42,5 @@ class TestUtilities(TestCase):
         permissions = utils.get_field_permissions()
         self.assertTrue('tests.account' in permissions)
         self.assertEqual(permissions['tests.account'],
-                         {'id', 'pk', 'user', 'expired_date', 'cards',
+                         {'id', 'user', 'expired_date', 'cards',
                           'is_expired', 'expired_date', 'full_name'})
