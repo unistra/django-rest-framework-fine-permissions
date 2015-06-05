@@ -14,7 +14,7 @@ from rest_framework import serializers
 from six import iterkeys, string_types
 from itertools import chain
 from rest_framework.compat import OrderedDict
-
+from rest_framework.utils import model_meta
 
 logger = logging.getLogger(__name__)
 APP_NAMES = None
@@ -60,26 +60,7 @@ def inherits_modelpermissions_serializer(cls):
     ]
     return inspect.isclass(cls) and is_serializer(cls) and is_modelperms(cls)
 
-
-def merge_fields_and_pk(pk, fields):
-    fields_and_pk = OrderedDict()
-    fields_and_pk[pk.name] = pk
-    fields_and_pk.update(fields)
-    return fields_and_pk
-
-def get_model_fields(model):
-    fields_info = get_field_info(model)
-    return chain(iterkeys(merge_fields_and_pk(fields_info.pk,
-                                              fields_info.fields)),
-                 iterkeys(fields_info.relations))
-
-def get_permitted_fields(model, serializer):
-    fields = get_model_fields(model)
-    permissions = iterkeys(serializer._declared_fields)
-    return set(chain(fields, permissions))
-
-
-def get_field_permissions():
+def get_field_permissions(request):
     """look for serializers in serializers.py files
     """
     perm_key = lambda m: '{0.app_label}.{0.model_name}'.format(m._meta)
@@ -95,7 +76,10 @@ def get_field_permissions():
                 if inherits_modelpermissions_serializer(obj):
                     try:
                         model = obj.Meta.model
-                        fields = get_permitted_fields(model, obj)
+                        ser = obj(context={'request': request})
+                        declared_fields = copy.deepcopy(ser._declared_fields)
+                        info = model_meta.get_field_info(model)
+                        fields = ser.get_field_names(declared_fields, info)
                         permissions[perm_key(model)] = fields
                     except AttributeError:
                         pass

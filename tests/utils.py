@@ -12,8 +12,8 @@ def create_user(username='test', **kwargs):
 
 def create_account(user):
     """ Create an account for tests. """
-    from datetime import datetime
-    return Account.objects.create(user=user, expired_date=datetime.now())
+    from datetime import date
+    return Account.objects.create(user=user, expired_date=date.today())
 
 
 def create_card(account):

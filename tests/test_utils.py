@@ -1,4 +1,6 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
+from django.http import HttpRequest
 from rest_framework_fine_permissions import utils
 from . import serializers as test_serializers
 from .models import Account
@@ -12,6 +14,7 @@ class TestUtilities(TestCase):
         self.account_ser = test_serializers.AccountSerializer
         self.normal_ser = test_serializers.TestNormalSerializer
 
+
     def test_inherits(self):
         """ Test inherits from ModelPermissionsSerializer. """
         self.assertTrue(
@@ -24,23 +27,17 @@ class TestUtilities(TestCase):
             utils.inherits_modelpermissions_serializer(self.normal_ser)
         )
 
-    def test_model_retrieving_model_fields(self):
-        """ Test field names extracted from the model. """
-        model_fields = ('id', 'user', 'expired_date', 'cards')
-        self.assertEqual(set(utils.get_model_fields(Account)),
-                         set(model_fields))
-
-    def test_permitted_fields(self):
-        """ Test list of fields displayed in admin interface. """
-        permit_fields = utils.get_permitted_fields(Account, self.account_ser)
-        model_fields = ('id', 'user', 'expired_date', 'cards')
-        serializer_fields = ('is_expired', 'full_name')
-        self.assertEqual(permit_fields, set(model_fields + serializer_fields))
-
     def test_field_permissions(self):
         """ Test retrieving permissions by application. """
-        permissions = utils.get_field_permissions()
+        user = User.objects.create_superuser('test', first_name='Beta',
+                                             last_name='Tester',
+                                             email='beta.tester@fail.org',
+                                             password='failures!')
+        request = HttpRequest()
+        request.user = user
+        permissions = utils.get_field_permissions(request)
         self.assertTrue('tests.account' in permissions)
-        self.assertEqual(permissions['tests.account'],
-                         {'id', 'user', 'expired_date', 'cards',
-                          'is_expired', 'expired_date', 'full_name'})
+        self.assertEqual(set(permissions['tests.account']),
+                         {'id', 'user', 'expired_date', 'upper_full_name',
+                          'is_expired', 'is_expired', 'full_name', 'wifi_group',
+                          'vpn_group', 'profile'})

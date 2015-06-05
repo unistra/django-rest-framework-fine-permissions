@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.http import HttpRequest
+from rest_framework.serializers import ListSerializer, PrimaryKeyRelatedField
 from rest_framework_fine_permissions.fields import get_serializer
 
 from . import serializers
@@ -67,8 +68,8 @@ class TestModelFieldPermissions(TestCase):
         self.card.services.add(service)
         self.card.services.add(service2)
 
-        ser = self._get_serializer_instance(instance=self.card)
-        data = ser.data
+        ser = self._get_serializer_instance()
+        data = ser.to_representation(self.card)
 
         self.assertEqual(sorted(data['service_names'][0]), ['id', 'name'])
         self.assertEqual(len(data['service_names']), 2)
@@ -81,28 +82,26 @@ class TestModelFieldPermissions(TestCase):
 
         ser = self._get_serializer_instance()
         service_names = ser.get_fields()['service_names']
-        self.assertEqual(get_serializer(service_names.serializer),
-                         serializers.ServiceSerializer)
+        self.assertIsInstance(service_names, ListSerializer)
+        self.assertIsInstance(service_names.child, serializers.ServiceSerializer)
 
-    def test_with_depth(self):
+
+    def test_with_cycle(self):
         """ Test with a defined depth. """
+        self.Serializer = serializers.CardWithModelPermissionsField
         self._add_field_perms('tests', 'card', 'id', 'account')
-        self._add_field_perms('tests', 'account', 'id', 'user', 'expired_date')
-        self._add_field_perms('auth', 'user', 'id', 'username', 'last_name')
-        
-        ser = self._get_serializer_instance(instance=self.card)
+        self._add_field_perms('tests', 'account', 'id', 'user', 'expired_date', 'cards')
+        # self._add_field_perms('auth', 'user', 'id', 'username', 'last_name')
 
+        ser = self._get_serializer_instance()
         account_field_ser = ser.get_fields()['account']
-        print(account_field_ser)
-        self.assertEqual(account_field_ser.__class__.__name__,
-                         'NestedModelPermissionSerializer')
-        self.assertEqual(account_field_ser.Meta.depth, 0)
+        self.assertIsInstance(account_field_ser,
+                              serializers.AccountWithModelPermissionsField)
 
         user_field_ser = account_field_ser.get_fields()['user']
-        self.assertEqual(user_field_ser.__class__.__name__,
-                         'NestedModelPermissionSerializer')
+        self.assertIsInstance(user_field_ser, PrimaryKeyRelatedField)
 
-        data = ser.data
+        data = ser.to_representation(self.card)
         self.assertEqual(data['account']['user'], self.account.user.id)
 
 

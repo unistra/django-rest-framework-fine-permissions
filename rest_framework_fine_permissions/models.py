@@ -8,10 +8,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from . import managers
+
 
 class FieldPermission(models.Model):
     name = models.CharField(_('name'), max_length=255)
     content_type = models.ForeignKey(ContentType)
+
+    objects = managers.FieldPermissionManager()
 
     class Meta:
         verbose_name = _('field permission')
