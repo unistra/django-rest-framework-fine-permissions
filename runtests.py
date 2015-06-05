@@ -14,7 +14,7 @@ if not settings.configured:
             'django.contrib.contenttypes',
             'django.contrib.auth',
             'rest_framework_fine_permissions',
-            'tests'
+            'rest_framework_fine_permissions.tests'
         ),
         MIDDLEWARE_CLASSES = (
             'django.middleware.common.CommonMiddleware',
