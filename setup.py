@@ -18,7 +18,7 @@ with open('requirements.txt') as requirements:
 
 setup(
     name='djangorestframework-fine-permissions',
-    version='0.5.1',
+    version='0.5.2',
     packages=find_packages(),
     install_requires=libraries,
     dependency_links=dependency_links,
