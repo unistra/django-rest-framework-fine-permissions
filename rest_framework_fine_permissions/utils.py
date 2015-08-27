@@ -4,13 +4,51 @@
 """
 
 import inspect
+import logging
 
 from django.conf import settings
 from django.utils.importlib import import_module
 from rest_framework.utils.model_meta import get_field_info
-from six import iterkeys
+from six import iterkeys, string_types
 from itertools import chain
 from rest_framework.compat import OrderedDict
+
+
+logger = logging.getLogger(__name__)
+APP_NAMES = None
+
+
+def get_application(app_label):
+    """ Get an application. """
+    try:
+        # django >= 1.7
+        from django.apps import apps as django_apps
+        return django_apps.get_app_package(app_label)
+    except ImportError:
+        # django < 1.7
+        from django.conf import settings
+        global APP_NAMES
+        if APP_NAMES is None:
+            APP_NAMES = {
+                app.rsplit('.', 1)[-1]: app for app in settings.INSTALLED_APPS
+            }
+        return APP_NAMES[app_label]
+
+
+def get_serializer(serializer):
+    """ Load a serializer. """
+    if isinstance(serializer, string_types):
+        try:
+            app_label, serializer_name = serializer.split('.')
+            app_package = get_application(app_label)
+            serializer_module = __import__('%s.serializers' % app_package,
+                                           fromlist=['serializers'])
+            serializer = getattr(serializer_module, serializer_name)
+        except Exception:
+            logger.error('Serializer %s not found' % serializer)
+            return None
+
+    return serializer
 
 
 def inherits_modelpermissions_serializer(cls):
@@ -28,11 +66,13 @@ def merge_fields_and_pk(pk, fields):
     fields_and_pk.update(fields)
     return fields_and_pk
 
+
 def get_model_fields(model):
     fields_info = get_field_info(model)
     return chain(iterkeys(merge_fields_and_pk(fields_info.pk,
                                               fields_info.fields)),
                  iterkeys(fields_info.relations))
+
 
 def get_permitted_fields(model, serializer):
     fields = get_model_fields(model)
