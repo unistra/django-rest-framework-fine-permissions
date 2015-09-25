@@ -115,7 +115,13 @@ class QSerializer():
     def __init__(self, base64=False):
         if base64:
             self.b64_enabled = True
-        self.min_ts = time.mktime(datetime.min.timetuple())
+        try:
+            self.min_ts = time.mktime(datetime.min.timetuple())
+        except OverflowError:
+            # This Exception is thrown by some PC / MAC architectures which
+            # can't work with dates before Epoch (01-01-1970). That's why, in
+            # this case we take as minimal value the EPOCH (gmtime(0)).
+            self.min_ts = time.mktime(time.gmtime(0))
         self.max_ts = time.mktime((3000,) + (0,) * 8)
         self.dt2ts = lambda obj: time.mktime(obj.timetuple()) if isinstance(
             obj, date) else obj
