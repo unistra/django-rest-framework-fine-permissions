@@ -8,19 +8,19 @@ Compatibility
 
 Works with :
 
-  * Python 2.7 / Python 3.4
-  * Django >= 1.6
+  * Python 2.7, 3.3, 3.4
+  * Django >= 1.7
   * Django Rest Framework >= 3.0
 
-.. image:: https://travis-ci.org/unistra/django-rest-framework-fine-permissions.svg?branch=drf3
+.. image:: https://travis-ci.org/unistra/django-rest-framework-fine-permissions.svg
     :target: https://travis-ci.org/unistra/django-rest-framework-fine-permissions
     
-.. image:: https://coveralls.io/repos/unistra/django-rest-framework-fine-permissions/badge.png?branch=drf3
-    :target: https://coveralls.io/r/unistra/django-rest-framework-fine-permissions?branch=drf3
+.. image:: https://coveralls.io/repos/unistra/django-rest-framework-fine-permissions/badge.png
+    :target: https://coveralls.io/r/unistra/django-rest-framework-fine-permissions
 
 .. image:: https://landscape.io/github/unistra/django-rest-framework-fine-permissions/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/unistra/django-rest-framework-fine-permissions/master
-      :alt: Code Health
+    :target: https://landscape.io/github/unistra/django-rest-framework-fine-permissions/master
+    :alt: Code Health
 
 
 Installation

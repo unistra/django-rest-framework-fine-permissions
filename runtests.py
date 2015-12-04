@@ -16,7 +16,7 @@ if not settings.configured:
             'rest_framework_fine_permissions',
             'tests'
         ),
-        MIDDLEWARE_CLASSES = (
+        MIDDLEWARE_CLASSES=(
             'django.middleware.common.CommonMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',

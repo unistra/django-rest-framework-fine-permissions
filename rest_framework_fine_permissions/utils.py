@@ -4,6 +4,7 @@
 """
 
 import inspect
+from collections import OrderedDict
 import logging
 
 from django.conf import settings
@@ -11,7 +12,6 @@ from django.utils.importlib import import_module
 from rest_framework.utils.model_meta import get_field_info
 from six import iterkeys, string_types
 from itertools import chain
-from rest_framework.compat import OrderedDict
 
 
 logger = logging.getLogger(__name__)
