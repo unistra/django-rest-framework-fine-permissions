@@ -41,8 +41,7 @@ def get_serializer(serializer):
         try:
             app_label, serializer_name = serializer.split('.')
             app_package = get_application(app_label)
-            serializer_module = __import__('%s.serializers' % app_package,
-                                           fromlist=['serializers'])
+            serializer_module = import_module('%s.serializers' % app_package)
             serializer = getattr(serializer_module, serializer_name)
         except Exception:
             logger.error('Serializer %s not found' % serializer)
