@@ -33,7 +33,7 @@ env:
 - TOX_ENV=py34-dj18-drf34
 
 install:
- - pip install tox --use-mirrors
+ - pip install tox
 script: tox -e $TOX_ENV
 after_success:
  - pip install coveralls
