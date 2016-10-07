@@ -23,6 +23,9 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         """ Check context to retrive authenticated user. """
+
+        self.cached_allowed_fields = kwargs.pop('cached_allowed_fields', {})
+
         super(ModelPermissionsSerializer, self).__init__(*args, **kwargs)
         # in case of a nested relation, we check context in meta options
         # of the nested class and set this for context
@@ -38,12 +41,17 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
         """ Retrieve all allowed field names ofr authenticated user. """
         model_name = self.Meta.model.__name__.lower()
         app_label = self.Meta.model._meta.app_label
+        full_model_name = '%s.%s' % (app_label, model_name)
+        permissions = self.cached_allowed_fields.get(full_model_name)
 
-        return FieldPermission.objects.filter(
-            user_field_permissions__user=self.user,
-            content_type__model=model_name,
-            content_type__app_label=app_label
-        )
+        if not permissions:
+            permissions = FieldPermission.objects.filter(
+                user_field_permissions__user=self.user,
+                content_type__model=model_name,
+                content_type__app_label=app_label
+            )
+            self.cached_allowed_fields[full_model_name] = permissions
+        return permissions
 
     def get_fields(self):
         """ Calculate fields that can be accessed by authenticated user. """

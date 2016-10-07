@@ -11,6 +11,7 @@ from django.db import models
 from rest_framework import serializers
 from rest_framework.fields import Field, empty
 
+from .serializers import ModelPermissionsSerializer
 from .utils import get_serializer
 
 logger = logging.getLogger(__name__)
@@ -37,5 +38,11 @@ class ModelPermissionsField(Field):
                 "Bad serializer defined %s" % serializer_cls
             )
 
-        ser = self.serializer(obj, context=self.context, many=many)
+        extra_params = {}
+        if issubclass(serializer_cls, ModelPermissionsSerializer):
+            extra_params['cached_allowed_fields'] =\
+                self.parent.cached_allowed_fields
+
+        ser = self.serializer(obj, context=self.context, many=many,
+                              **extra_params)
         return ser.data
