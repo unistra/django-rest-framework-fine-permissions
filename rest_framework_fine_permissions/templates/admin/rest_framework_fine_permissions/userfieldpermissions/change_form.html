@@ -1,0 +1,16 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+    {{ block.super }}
+    <div class="submit-row">
+        <div style="float: right;">
+            {% if original %}
+            <a href="{% url 'drffp-export' original.pk %}" download="user_permissions_{{ original }}.json">Export field permissions as JSON</a><br/>
+            {% endif %}
+            <form action="{% if original %}{% url 'drffp-import-ufp' original.pk %}{% else %}{% url 'drffp-import' %}{% endif %}" enctype="multipart/form-data" method="post">{% csrf_token %}
+               <input type="file" accept="application/json" name="perms_upload" id="perms_upload"/>
+               <input type="submit" value="Import field permissions from JSON">
+            </form>
+        </div>
+    </div>
+{% endblock %}

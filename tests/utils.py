@@ -5,9 +5,15 @@ from rest_framework_fine_permissions import models
 from .models import Card, Account, Service
 
 
-def create_user(username='test', **kwargs):
+def create_user(username='test', password='pass', **kwargs):
     """ Create a user for tests. """
-    return User.objects.create_user(username, **kwargs)
+    return User.objects.create_user(username, password=password, **kwargs)
+
+
+def create_superuser(username='supertest', email='supertest@test.com',
+                     password='pass', **kwargs):
+    """ Create a user for tests. """
+    return User.objects.create_superuser(username, email, password, **kwargs)
 
 
 def create_account(user):

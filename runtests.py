@@ -13,6 +13,8 @@ if not settings.configured:
         INSTALLED_APPS=(
             'django.contrib.contenttypes',
             'django.contrib.auth',
+            'django.contrib.sessions',
+            'django.contrib.messages',
             'rest_framework_fine_permissions',
             'tests'
         ),
@@ -20,8 +22,9 @@ if not settings.configured:
             'django.middleware.common.CommonMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
         ),
-        ROOT_URLCONF=None,
+        ROOT_URLCONF='tests.urls',
         USE_TZ=True,
         SECRET_KEY='foobar',
         # SILENCED_SYSTEM_CHECKS=['1_7.W001'],
