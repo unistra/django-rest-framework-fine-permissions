@@ -76,7 +76,7 @@ class TestViews(TestCase):
             ]
         }"""
 
-        f = SimpleUploadedFile('file.txt', permissions_str,
+        f = SimpleUploadedFile('file.txt', permissions_str.encode('utf-8'),
                                content_type='application/json')
         response = self.client.post('/drffp/import/%s/' % ufp.pk,
                                     {'perms_upload': f})
@@ -92,7 +92,7 @@ class TestViews(TestCase):
         ufp = UserFieldPermissions.objects.get(user=self.user)
         permissions_str = 'empty'
 
-        f = SimpleUploadedFile('file.txt', permissions_str,
+        f = SimpleUploadedFile('file.txt', permissions_str.encode('utf-8'),
                                content_type='application/json')
         response = self.client.post('/drffp/import/%s/' % ufp.pk,
                                     {'perms_upload': f})
@@ -114,7 +114,7 @@ class TestViews(TestCase):
             ]
         }"""
 
-        f = SimpleUploadedFile('file.txt', permissions_str,
+        f = SimpleUploadedFile('file.txt', permissions_str.encode('utf-8'),
                                content_type='application/json')
         response = self.client.post('/drffp/import/%s/' % ufp.pk,
                                     {'perms_upload': f})
@@ -140,7 +140,7 @@ class TestViews(TestCase):
                 {"app_label": "tests", "model": "account", "name": "user"}
             ]
         }"""
-        f = SimpleUploadedFile('file.txt', permissions_str,
+        f = SimpleUploadedFile('file.txt', permissions_str.encode('utf-8'),
                                content_type='application/json')
         response = self.client.post('/drffp/import/', {'perms_upload': f})
         ufp = UserFieldPermissions.objects.get(user=self.user)
