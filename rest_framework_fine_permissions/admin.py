@@ -7,8 +7,11 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.contenttypes.models import ContentType
-
+from django.contrib import messages
 from django.db.models import Q
+from django.utils.html import format_html
+
+from .fields import ModelPermissionsField
 from .models import FieldPermission, UserFieldPermissions, FilterPermissionModel
 from .utils import get_field_permissions
 from .serializers import QSerializer
@@ -39,9 +42,14 @@ class UserFieldPermissionsForm(forms.ModelForm):
                 .format(model=model.split('.'), field=field, sep=sep)
 
         choices = []
-        for model, fields in get_field_permissions().items():
+        self.field_permissions = get_field_permissions()
+        self.field_serializers = {}
+
+        for model, values in self.field_permissions.items():
+            fields, ser = values
             choices += [(choice_str(model, field, '.'), choice_str(model, field, ' | '))
                         for field in fields]
+            self.field_serializers.update({choice_str(model, field, '.'): ser for field in fields})
         self.fields['permissions'].choices = sorted(choices)
 
         # Initial datas
@@ -56,27 +64,46 @@ class UserFieldPermissionsForm(forms.ModelForm):
             ]
             self.initial['permissions'] = fps
 
-    def save(self, commit=True):
-        form = super(UserFieldPermissionsForm, self).save(commit=False)
+    def clean(self):
         cleaned = self.cleaned_data
-
         field_permissions = []
+        model_perms = {}
+        conflicts = []
+
         for permission in cleaned['permissions']:
-            app_label, model_name, field = permission.split('.')
+            app_label, model_name, field_name = permission.split('.')
             ct = ContentType.objects.get_by_natural_key(app_label, model_name)
             fp = FieldPermission.objects.get_or_create(
                 content_type=ct,
-                name=field
+                name=field_name
             )[0]
             field_permissions.append(fp.pk)
 
+            # Check for each added permission if there is a recursive call
+            # between two ModelPermissionsField fields
+            app = '%s.%s' % (app_label, model_name)
+            values = self.field_permissions.get(app)
+            fields = values[0] if values else []
+
+            if field_name in fields:
+                field = self.field_permissions.get(app)
+                field = field[0][field_name] if field else None
+
+                if isinstance(field, ModelPermissionsField):
+                    name = '{0.__module__}.{0.__name__}'.format(field.serializer)
+                    model_perms[self.field_serializers[permission]] = permission
+
+                    if name in model_perms:
+                        conflicts.append(
+                            '<li><b>%s</b> and <b>%s</b></li>'\
+                                % (permission, model_perms[name]))
+
+        if conflicts:
+            msg = 'Recursive ModelPermissionsField call between<ul>{}</ul>'\
+                .format(''.join(conflicts))
+            raise forms.ValidationError(format_html(msg))
+
         self.cleaned_data['permissions'] = field_permissions
-
-        if commit:
-            form.save()
-            form.save_m2m()
-
-        return form
 
 
 class UserFieldPermissionsAdmin(admin.ModelAdmin):
@@ -90,7 +117,6 @@ class UserFieldPermissionsAdmin(admin.ModelAdmin):
 class ContentTypeChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s | %s" % (obj.app_label, obj.model)
-
 
 
 class UserFilterPermissionsForm(forms.ModelForm):
@@ -124,7 +150,6 @@ class UserFilterPermissionsForm(forms.ModelForm):
         self.initial['filter'] = QSerializer().dumps(myq)
 
         self.fields['filter'].widget.attrs['rows'] = len(self.initial['filter'].splitlines()) + 4
-
 
     def clean_filter(self):
         data = self.cleaned_data['filter']

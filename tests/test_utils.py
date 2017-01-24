@@ -35,12 +35,16 @@ class TestUtilities(TestCase):
         permit_fields = utils.get_permitted_fields(Account, self.account_ser)
         model_fields = ('id', 'user', 'expired_date', 'cards')
         serializer_fields = ('is_expired', 'full_name')
-        self.assertEqual(permit_fields, set(model_fields + serializer_fields))
+        self.assertEqual(
+            set(permit_fields.keys()), set(model_fields + serializer_fields))
 
     def test_field_permissions(self):
         """ Test retrieving permissions by application. """
         permissions = utils.get_field_permissions()
         self.assertTrue('tests.account' in permissions)
-        self.assertEqual(permissions['tests.account'],
-                         {'id', 'user', 'expired_date', 'cards',
-                          'is_expired', 'expired_date', 'full_name'})
+        self.assertEqual(
+            set(permissions['tests.account'][0].keys()),
+            {
+                'id', 'user', 'expired_date', 'cards', 'is_expired',
+                'expired_date', 'full_name'
+            })

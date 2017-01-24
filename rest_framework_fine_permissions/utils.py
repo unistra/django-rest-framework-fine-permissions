@@ -43,10 +43,9 @@ def get_serializer(serializer):
             app_package = get_application(app_label)
             serializer_module = import_module('%s.serializers' % app_package)
             serializer = getattr(serializer_module, serializer_name)
-        except Exception:
-            logger.error('Serializer %s not found' % serializer)
+        except Exception as e:
+            logger.error('Serializer %s not found: %s' % (serializer, e))
             return None
-
     return serializer
 
 
@@ -75,15 +74,15 @@ def get_model_fields(model):
 
 def get_permitted_fields(model, serializer):
     fields = get_model_fields(model)
-    permissions = iterkeys(serializer._declared_fields)
-    return set(chain(fields, permissions))
+    result = dict.fromkeys(fields, None)
+    result.update(serializer._declared_fields)
+    return result
 
 
 def get_field_permissions():
-    """look for serializers in serializers.py files
-    """
     perm_key = lambda m: '{0.app_label}.{0.model_name}'.format(m._meta)
-    permissions = {}
+    serializer_name = lambda obj: '{0.__module__}.{0.__name__}'.format(obj)
+    serializers = {}
 
     for app in settings.INSTALLED_APPS:
         try:
@@ -96,11 +95,12 @@ def get_field_permissions():
                     try:
                         model = obj.Meta.model
                         fields = get_permitted_fields(model, obj)
-                        permissions[perm_key(model)] = fields
+                        serializers[perm_key(model)] = (
+                            fields, serializer_name(obj))
                     except AttributeError:
                         pass
 
         except ImportError:
             continue
 
-    return permissions
+    return serializers

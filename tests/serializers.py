@@ -17,6 +17,7 @@ class AccountSerializer(serializers.ModelPermissionsSerializer):
     is_expired = drf_serializers.BooleanField(source='is_expired',
                                               read_only=True)
     full_name = drf_serializers.CharField(source='full_name', read_only=True)
+    cards = fields.ModelPermissionsField('tests.CardSerializer')
 
     class Meta:
         depth = 1
@@ -31,6 +32,7 @@ class CardSerializer(serializers.ModelPermissionsSerializer):
     class Meta:
         model = Card
 
+
 class AnotherCardSerializer(serializers.ModelPermissionsSerializer):
 
     account = fields.ModelPermissionsField(AccountSerializer)
@@ -38,6 +40,7 @@ class AnotherCardSerializer(serializers.ModelPermissionsSerializer):
 
     class Meta:
         model = Card
+
 
 class BadCardSerializer(serializers.ModelPermissionsSerializer):
 
