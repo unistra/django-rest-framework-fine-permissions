@@ -22,8 +22,15 @@ class ModelPermissionsField(Field):
     """ Field that acts as a ModelPermissionsSerializer for relations. """
 
     def __init__(self, serializer, **kwargs):
-        self.serializer = get_serializer(serializer)
         super(ModelPermissionsField, self).__init__(**kwargs)
+        self._serializer = serializer
+        self._serializer_cls = None
+
+    @property
+    def serializer(self):
+        if not self._serializer_cls:
+            self._serializer_cls = get_serializer(self._serializer)
+        return self._serializer_cls
 
     def to_representation(self, obj):
         """ Represent data for the field. """
@@ -31,15 +38,13 @@ class ModelPermissionsField(Field):
             or isinstance(obj, models.Manager) \
             and not isinstance(obj, dict)
 
-        serializer_cls = get_serializer(self.serializer)
-
-        assert serializer_cls is not None \
-            and issubclass(serializer_cls, serializers.ModelSerializer), (
-                "Bad serializer defined %s" % serializer_cls
+        assert self.serializer is not None \
+            and issubclass(self.serializer, serializers.ModelSerializer), (
+                "Bad serializer defined %s" % self.serializer
             )
 
         extra_params = {}
-        if issubclass(serializer_cls, ModelPermissionsSerializer):
+        if issubclass(self.serializer, ModelPermissionsSerializer):
             extra_params['cached_allowed_fields'] =\
                 self.parent.cached_allowed_fields
 
