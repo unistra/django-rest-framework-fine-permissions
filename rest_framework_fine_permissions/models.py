@@ -28,7 +28,8 @@ class FieldPermission(models.Model):
 @python_2_unicode_compatible
 class UserFieldPermissions(models.Model):
     user = models.OneToOneField(User)
-    permissions = models.ManyToManyField(FieldPermission,
+    permissions = models.ManyToManyField(
+        FieldPermission,
         related_name='user_field_permissions',
         db_table='drf_user_field_permissions_permission')
 

@@ -26,7 +26,6 @@ def get_application(app_label):
         return django_apps.get_app_package(app_label)
     except ImportError:
         # django < 1.7
-        from django.conf import settings
         global APP_NAMES
         if APP_NAMES is None:
             APP_NAMES = {
@@ -51,11 +50,13 @@ def get_serializer(serializer):
 
 def inherits_modelpermissions_serializer(cls):
     """ Verify that serializer is a :py:class:`~rest_framework_fine_permissions.serializers.ModelPermissionsSerializer`. """
-    is_serializer = lambda ser: type(ser).__name__ == 'SerializerMetaclass'
-    is_modelperms = lambda ser: 'ModelPermissionsSerializer' in [
-        cls.__name__ for cls in ser.__bases__
-    ]
-    return inspect.isclass(cls) and is_serializer(cls) and is_modelperms(cls)
+    def is_modelperms():
+        return 'ModelPermissionsSerializer' in [
+            ser.__name__ for ser in cls.__bases__
+        ]
+    is_serializer = type(cls).__name__ == 'SerializerMetaclass'
+
+    return inspect.isclass(cls) and is_serializer and is_modelperms()
 
 
 def merge_fields_and_pk(pk, fields):
@@ -80,8 +81,6 @@ def get_permitted_fields(model, serializer):
 
 
 def get_field_permissions():
-    perm_key = lambda m: '{0.app_label}.{0.model_name}'.format(m._meta)
-    serializer_name = lambda obj: '{0.__module__}.{0.__name__}'.format(obj)
     serializers = {}
 
     for app in settings.INSTALLED_APPS:
@@ -95,8 +94,10 @@ def get_field_permissions():
                     try:
                         model = obj.Meta.model
                         fields = get_permitted_fields(model, obj)
-                        serializers[perm_key(model)] = (
-                            fields, serializer_name(obj))
+                        perm_key = '{0.app_label}.{0.model_name}'\
+                            .format(model._meta)
+                        serializers[perm_key] = (
+                            fields, '{0.__module__}.{0.__name__}'.format(obj))
                     except AttributeError:
                         pass
 

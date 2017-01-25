@@ -37,8 +37,8 @@ class UserFieldPermissionsForm(forms.ModelForm):
         super(UserFieldPermissionsForm, self).__init__(*args, **kwargs)
 
         # Choices
-        choice_str = lambda model, field, sep:\
-            '{model[0]}{sep}{model[1]}{sep}{field}'\
+        def choice_str(model, field, sep):
+            return '{model[0]}{sep}{model[1]}{sep}{field}'\
                 .format(model=model.split('.'), field=field, sep=sep)
 
         choices = []
@@ -60,8 +60,7 @@ class UserFieldPermissionsForm(forms.ModelForm):
                         'content_type__app_label',
                         'content_type__model',
                         'name'
-                    )
-            ]
+                    )]
             self.initial['permissions'] = fps
 
     def clean(self):
@@ -95,8 +94,8 @@ class UserFieldPermissionsForm(forms.ModelForm):
 
                     if name in model_perms:
                         conflicts.append(
-                            '<li><b>%s</b> and <b>%s</b></li>'\
-                                % (permission, model_perms[name]))
+                            '<li><b>%s</b> and <b>%s</b></li>'
+                            % (permission, model_perms[name]))
 
         if conflicts:
             msg = 'Recursive ModelPermissionsField call between<ul>{}</ul>'\

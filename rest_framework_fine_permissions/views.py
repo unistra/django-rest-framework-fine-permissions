@@ -57,8 +57,8 @@ def permissions_import_json(request, ufp_id=0):
         messages.add_message(request, messages.ERROR, message)
 
     return redirect(
-        '/admin/rest_framework_fine_permissions/userfieldpermissions/%s'\
-            % ufp_id)
+        '/admin/rest_framework_fine_permissions/userfieldpermissions/%s'
+        % ufp_id)
 
 
 def _add_permissions(request, ufp, perms):

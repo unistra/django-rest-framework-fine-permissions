@@ -4,12 +4,11 @@
 """
 
 import logging
-import six
 import collections
 
 from django.db import models
 from rest_framework import serializers
-from rest_framework.fields import Field, empty
+from rest_framework.fields import Field
 
 from .serializers import ModelPermissionsSerializer
 from .utils import get_serializer

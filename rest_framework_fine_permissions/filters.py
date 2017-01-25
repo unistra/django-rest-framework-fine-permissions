@@ -28,5 +28,3 @@ class FilterPermissionBackend(BaseFilterBackend):
             return queryset.filter(myfilter)
         else:
             return queryset
-
-
