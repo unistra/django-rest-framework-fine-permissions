@@ -2,3 +2,4 @@ include README.rst
 include LICENSE
 include requirements.txt
 recursive-include docs *
+recursive-include rest_framework_fine_permissions/templates *.html
