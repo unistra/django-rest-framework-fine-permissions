@@ -22,6 +22,7 @@ setup(
     packages=find_packages(),
     install_requires=libraries,
     dependency_links=dependency_links,
+    include_package_data=True,
     long_description=long_description,
     author='Arnaud Grausem',
     author_email='arnaud.grausem@unistra.fr',
