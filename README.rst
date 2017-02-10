@@ -14,7 +14,7 @@ Works with :
 
 .. image:: https://travis-ci.org/unistra/django-rest-framework-fine-permissions.svg?branch=master
     :target: https://travis-ci.org/unistra/django-rest-framework-fine-permissions
-    
+
 .. image:: https://coveralls.io/repos/github/unistra/django-rest-framework-fine-permissions/badge.svg?branch=master
     :target: https://coveralls.io/github/unistra/django-rest-framework-fine-permissions?branch=master
 
@@ -125,18 +125,18 @@ Example
     from rest_framework import serializers
     from rest_framework_fine_permissions.fields import ModelPermissionsField
     from rest_framework_fine_permissions.serializers import ModelPermissionsSerializer
-     
+
     from . import models
 
     class PollsChoiceSerializer(ModelPermissionsSerializer):
         class Meta:
             model = models.PollsChoice
-     
+
     class PollsQuestionSerializer(ModelPermissionsSerializer):
         was_published_recently = serializers.SerializerMethodField()
         votes = serializers.IntegerField(source='sum_votes')
         choices = ModelPermissionsField(PollsChoiceSerializer)
-     
+
         class Meta:
             model = models.PollsQuestion
 
@@ -150,7 +150,7 @@ Example
     from . import models
     from . import serializers
     from rest_framework import generics
-    
+
     class PollsChoiceDetail(generics.RetrieveUpdateDestroyAPIView):
         queryset = models.PollsChoice.objects.all()
         serializer_class = serializers.PollsChoiceSerializer
@@ -162,7 +162,7 @@ Example
     from django.conf.urls import patterns, url
     from rest_framework.urlpatterns import format_suffix_patterns
     from . import views
-    
+
     urlpatterns = [,
         url(r'^pollsquestion/(?P<pk>\w+)$', views.PollsQuestionDetail.as_view(), name='pollsquestion-all-detail'),
     ]
@@ -200,3 +200,14 @@ You can finally call your webservice :
         "votes": 7,
         "was_published_recently": false
     }
+
+Import/Export
+-------------
+
+To export field's permissions, you can use the following command : ::
+
+    python manage.py fine_permissions_dump myuser > /tmp/myuserfieldsperms.json
+
+To import field's permissions, you can use the following command : ::
+
+    python manage.py fine_permissions_load -u anotheruser /tmp/myuserfieldsperms.json
