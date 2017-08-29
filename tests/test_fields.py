@@ -1,7 +1,10 @@
 from django.test import TestCase
 from django.http import HttpRequest
-from rest_framework_fine_permissions.fields import get_serializer
+from rest_framework.exceptions import ValidationError
+from rest_framework_fine_permissions.fields import (
+    get_serializer, ModelPermissionsField)
 
+from . import models
 from . import serializers
 from . import utils
 
@@ -83,6 +86,25 @@ class TestModelFieldPermissions(TestCase):
         service_names = ser.get_fields()['service_names']
         self.assertEqual(service_names.serializer,
                          serializers.ServiceSerializer)
+
+    def test_to_internal_value(self):
+        field = ModelPermissionsField(
+            serializers.AccountSerializer,
+            queryset=models.Account.objects.all()
+        )
+        instance = field.to_internal_value(self.account.pk)
+        self.assertEqual(instance.pk, self.account.pk)
+
+    def test_to_internal_value_does_not_exist(self):
+        field = ModelPermissionsField(
+            serializers.AccountSerializer,
+            queryset=models.Account.objects.all()
+        )
+        with self.assertRaises(ValidationError) as ve:
+            field.to_internal_value(0)
+        msg = ve.exception.detail[0]
+
+        self.assertEqual('Object with pk=0 does not exist.', msg)
 
 
 class TestLoadSerializer(TestCase):
