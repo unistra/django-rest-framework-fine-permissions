@@ -10,6 +10,7 @@ class ServiceSerializer(serializers.ModelPermissionsSerializer):
 
     class Meta:
         model = Service
+        fields = '__all__'
 
 
 class AccountSerializer(serializers.ModelPermissionsSerializer):
@@ -22,6 +23,7 @@ class AccountSerializer(serializers.ModelPermissionsSerializer):
     class Meta:
         depth = 1
         model = Account
+        fields = '__all__'
 
 
 class CardSerializer(serializers.ModelPermissionsSerializer):
@@ -31,6 +33,7 @@ class CardSerializer(serializers.ModelPermissionsSerializer):
 
     class Meta:
         model = Card
+        fields = '__all__'
 
 
 class AnotherCardSerializer(serializers.ModelPermissionsSerializer):
@@ -40,6 +43,7 @@ class AnotherCardSerializer(serializers.ModelPermissionsSerializer):
 
     class Meta:
         model = Card
+        fields = '__all__'
 
 
 class BadCardSerializer(serializers.ModelPermissionsSerializer):
@@ -48,6 +52,7 @@ class BadCardSerializer(serializers.ModelPermissionsSerializer):
 
     class Meta:
         model = Card
+        fields = '__all__'
 
 
 class TestNormalSerializer(drf_serializers.ModelSerializer):

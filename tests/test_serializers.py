@@ -91,7 +91,7 @@ class TestModelSerializer(TestCase, ModelSerializerTestMixin):
         self._add_field_perms('tests', 'account', 'id', 'user')
         ser = self._get_serializer_instance()
         fields = ser.get_fields()
-        self.assertIsInstance(fields['user'], ser._related_class)
+        self.assertEqual(fields['user'].__class__.__name__, 'NestedSerializer')
 
     def test_allowed_fields_with_no_rights(self):
         """ Test allowed fields with no rights defined for user. """

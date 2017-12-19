@@ -25,12 +25,18 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
         """ Check context to retrive authenticated user. """
 
         self.cached_allowed_fields = kwargs.pop('cached_allowed_fields', {})
-
         super(ModelPermissionsSerializer, self).__init__(*args, **kwargs)
+
         # in case of a nested relation, we check context in meta options
         # of the nested class and set this for context
         # otherwise, the context is defined by the inherited serializer class.
         if not self.context:
+            # Force to re-compute the context cached_property for drf<3.6
+            try:
+                del self.context
+            except Exception:
+                pass
+
             self._context = getattr(self.Meta, 'nested_context', {})
         try:
             self.user = self.context['request'].user
@@ -104,12 +110,11 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
 
             """ Default nested class for relation. """
 
-            info = relation_info
-
             class Meta:
-                model = relation_info.related
+                model = relation_info.related_model
                 depth = nested_depth - 1
                 nested_context = self.context
+                fields = '__all__'
 
         return NestedModelPermissionSerializer
 
@@ -156,7 +161,7 @@ class QSerializer():
                 children.append(self.serialize(child))
             else:
                 children.append(child)
-        serialized = q.clone().__dict__
+        serialized = q.__dict__
         serialized['children'] = children
         return serialized
 

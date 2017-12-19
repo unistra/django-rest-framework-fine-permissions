@@ -3,12 +3,13 @@
 """
 """
 
+from importlib import import_module
 import inspect
 from collections import OrderedDict
 import logging
 
+from django.apps import apps
 from django.conf import settings
-from django.utils.importlib import import_module
 from rest_framework.utils.model_meta import get_field_info
 from six import iterkeys, string_types
 from itertools import chain
@@ -20,18 +21,8 @@ APP_NAMES = None
 
 def get_application(app_label):
     """ Get an application. """
-    try:
-        # django >= 1.7
-        from django.apps import apps as django_apps
-        return django_apps.get_app_package(app_label)
-    except ImportError:
-        # django < 1.7
-        global APP_NAMES
-        if APP_NAMES is None:
-            APP_NAMES = {
-                app.rsplit('.', 1)[-1]: app for app in settings.INSTALLED_APPS
-            }
-        return APP_NAMES[app_label]
+    app_config = apps.get_app_config(app_label)
+    return app_config.module.__name__
 
 
 def get_serializer(serializer):
