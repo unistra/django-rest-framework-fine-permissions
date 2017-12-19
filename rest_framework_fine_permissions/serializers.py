@@ -41,7 +41,7 @@ class ModelPermissionsSerializer(serializers.ModelSerializer):
         try:
             self.user = self.context['request'].user
         except KeyError:
-            self.user = None
+            self.user = self.context.get('user', None)
 
     def _get_user_allowed_fields(self):
         """ Retrieve all allowed field names ofr authenticated user. """
