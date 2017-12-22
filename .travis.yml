@@ -5,50 +5,14 @@ python:
     - "3.4"
     - "3.5"
 env:
-- TOX_ENV=py33-dj18-drf33
-- TOX_ENV=py33-dj18-drf34
-- TOX_ENV=py33-dj18-drf35
-- TOX_ENV=py33-dj18-drf36
-- TOX_ENV=py27-dj18-drf33
-- TOX_ENV=py27-dj18-drf34
-- TOX_ENV=py27-dj18-drf35
-- TOX_ENV=py27-dj18-drf36
-- TOX_ENV=py27-dj19-drf33
-- TOX_ENV=py27-dj19-drf34
-- TOX_ENV=py27-dj19-drf35
-- TOX_ENV=py27-dj19-drf36
-- TOX_ENV=py34-dj18-drf33
-- TOX_ENV=py34-dj18-drf34
-- TOX_ENV=py34-dj18-drf35
-- TOX_ENV=py34-dj18-drf36
-- TOX_ENV=py34-dj19-drf33
-- TOX_ENV=py34-dj19-drf34
-- TOX_ENV=py34-dj19-drf35
-- TOX_ENV=py34-dj19-drf36
-- TOX_ENV=py35-dj18-drf33
-- TOX_ENV=py35-dj18-drf34
-- TOX_ENV=py35-dj18-drf35
-- TOX_ENV=py35-dj18-drf36
-- TOX_ENV=py35-dj19-drf33
-- TOX_ENV=py35-dj19-drf34
-- TOX_ENV=py35-dj19-drf35
-- TOX_ENV=py35-dj19-drf36
-- TOX_ENV=py27-dj110-drf36
-- TOX_ENV=py27-dj110-drf37
-- TOX_ENV=py27-dj111-drf36
-- TOX_ENV=py27-dj111-drf37
-- TOX_ENV=py34-dj110-drf36
-- TOX_ENV=py34-dj110-drf37
-- TOX_ENV=py34-dj111-drf36
-- TOX_ENV=py34-dj111-drf37
-- TOX_ENV=py35-dj110-drf36
-- TOX_ENV=py35-dj110-drf37
-- TOX_ENV=py35-dj111-drf36
-- TOX_ENV=py35-dj111-drf37
+    - DJANGO=1.8
+    - DJANGO=1.9
+    - DJANGO=1.10
+    - DJANGO=1.11
 
 install:
- - pip install tox
-script: tox -e $TOX_ENV
+ - pip install tox-travis
+script: tox
 after_success:
  - pip install coveralls
  - coveralls
