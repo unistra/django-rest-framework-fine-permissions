@@ -37,9 +37,8 @@ def permissions_import_json(request, ufp_id=0):
             if ufp_id:
                 ufp = get_object_or_404(UserFieldPermissions, pk=ufp_id)
                 if username == ufp.user.username:
-                    # Delete the old field permissions
-                    ufp.permissions.all().delete()
-                    _add_permissions(request, ufp, perms)
+                    # Clear the old field permissions
+                    ufp.permissions.clear()
                 else:
                     message = 'The wrong user is defined in the imported file'
                     messages.add_message(request, messages.ERROR, message)
@@ -47,8 +46,9 @@ def permissions_import_json(request, ufp_id=0):
                 user = get_object_or_404(User, username=username)
                 ufp = UserFieldPermissions(user=user)
                 ufp.save()
-                _add_permissions(request, ufp, perms)
-                ufp_id = ufp.pk
+
+            _add_permissions(request, ufp, perms)
+            ufp_id = ufp.pk
         except Exception as e:
             message = 'Error in the import : %s' % e
             messages.add_message(request, messages.ERROR, message)
