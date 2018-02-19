@@ -49,15 +49,15 @@ class TestModelFieldPermissions(TestCase):
 
     def test_simple_data_in_permissions_field(self):
         """ Test with a many to one field. """
-        self._add_field_perms('tests', 'account', 'id', 'user')
+        self._add_field_perms('tests', 'account', 'user')
         self._add_field_perms('tests', 'card', 'account')
 
         ser = self._get_serializer_instance(instance=self.card)
 
         data = ser.data
 
-        self.assertEqual(sorted(data['account']), ['id', 'user'])
-        self.assertEqual(data['account']['id'], self.account.id)
+        self.assertEqual(sorted(data['account']), ['user'])
+        self.assertEqual(data['account']['user']['id'], self.test_user.id)
 
     def test_list_data_in_permissions_field(self):
         """ Test with a many to one field. """

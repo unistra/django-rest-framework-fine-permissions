@@ -7,12 +7,12 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.contenttypes.models import ContentType
-from django.contrib import messages
 from django.db.models import Q
 from django.utils.html import format_html
 
 from .fields import ModelPermissionsField
-from .models import FieldPermission, UserFieldPermissions, FilterPermissionModel
+from .models import (
+    FieldPermission, UserFieldPermissions, FilterPermissionModel)
 from .utils import get_field_permissions
 from .serializers import QSerializer
 
@@ -47,9 +47,12 @@ class UserFieldPermissionsForm(forms.ModelForm):
 
         for model, values in self.field_permissions.items():
             fields, ser = values
-            choices += [(choice_str(model, field, '.'), choice_str(model, field, ' | '))
-                        for field in fields]
-            self.field_serializers.update({choice_str(model, field, '.'): ser for field in fields})
+            choices += [(
+                choice_str(model, field, '.'),
+                choice_str(model, field, ' | '))
+                for field in fields]
+            self.field_serializers.update(
+                {choice_str(model, field, '.'): ser for field in fields})
         self.fields['permissions'].choices = sorted(choices)
 
         # Initial datas
@@ -57,10 +60,10 @@ class UserFieldPermissionsForm(forms.ModelForm):
         if instance:
             fps = ['.'.join(fp) for fp in instance.permissions.all()
                    .values_list(
-                        'content_type__app_label',
-                        'content_type__model',
-                        'name'
-                    )]
+                       'content_type__app_label',
+                       'content_type__model',
+                       'name')
+                   ]
             self.initial['permissions'] = fps
 
     def clean(self):
@@ -69,7 +72,7 @@ class UserFieldPermissionsForm(forms.ModelForm):
         model_perms = {}
         conflicts = []
 
-        for permission in cleaned['permissions']:
+        for permission in cleaned.get('permissions', []):
             app_label, model_name, field_name = permission.split('.')
             ct = ContentType.objects.get_by_natural_key(app_label, model_name)
             fp = FieldPermission.objects.get_or_create(
@@ -89,7 +92,8 @@ class UserFieldPermissionsForm(forms.ModelForm):
                 field = field[0][field_name] if field else None
 
                 if isinstance(field, ModelPermissionsField):
-                    name = '{0.__module__}.{0.__name__}'.format(field.serializer)
+                    name = '{0.__module__}.{0.__name__}'.format(
+                        field.serializer)
                     model_perms[self.field_serializers[permission]] = permission
 
                     if name in model_perms:
@@ -111,6 +115,7 @@ class UserFieldPermissionsAdmin(admin.ModelAdmin):
     """
     list_display = ('user', )
     form = UserFieldPermissionsForm
+    ordering = ('user__username',)
 
 
 class ContentTypeChoiceField(forms.ModelChoiceField):
@@ -124,14 +129,15 @@ class UserFilterPermissionsForm(forms.ModelForm):
     """
 
     current_filter = forms.CharField(required=False)
-    content_type = ContentTypeChoiceField(queryset=ContentType.objects.all().order_by('app_label', 'model'))
+    content_type = ContentTypeChoiceField(
+        queryset=ContentType.objects.all().order_by('app_label', 'model'))
 
     class Meta:
         model = FilterPermissionModel
         exclude = []
 
     def __init__(self, *args, **kwargs):
-        form = super(UserFilterPermissionsForm, self).__init__(*args, **kwargs)
+        super(UserFilterPermissionsForm, self).__init__(*args, **kwargs)
 
         # Initial datas
         instance = kwargs.get('instance')
@@ -148,15 +154,17 @@ class UserFilterPermissionsForm(forms.ModelForm):
         self.initial['current_filter'] = current_filter
         self.initial['filter'] = QSerializer().dumps(myq)
 
-        self.fields['filter'].widget.attrs['rows'] = len(self.initial['filter'].splitlines()) + 4
+        self.fields['filter'].widget.attrs['rows'] = len(
+            self.initial['filter'].splitlines()) + 4
 
     def clean_filter(self):
         data = self.cleaned_data['filter']
         if data:
             try:
                 myq = QSerializer().loads(data)
-            except:
-                raise forms.ValidationError("filter is not a valid entry for a q object !")
+            except Exception:
+                raise forms.ValidationError(
+                    "filter is not a valid entry for a q object !")
             else:
                 if isinstance(myq, Q):
                     data = QSerializer(base64=True).dumps(myq)

@@ -23,7 +23,7 @@ class AccountSerializer(serializers.ModelPermissionsSerializer):
     class Meta:
         depth = 1
         model = Account
-        fields = '__all__'
+        exclude = ('id',)
 
 
 class CardSerializer(serializers.ModelPermissionsSerializer):

@@ -68,6 +68,11 @@ def get_permitted_fields(model, serializer):
     fields = get_model_fields(model)
     result = dict.fromkeys(fields, None)
     result.update(serializer._declared_fields)
+    exclude = getattr(serializer.Meta, 'exclude', ())
+
+    for field in exclude:
+        result.pop(field, None)
+
     return result
 
 

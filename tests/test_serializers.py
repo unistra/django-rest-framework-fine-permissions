@@ -88,7 +88,7 @@ class TestModelSerializer(TestCase, ModelSerializerTestMixin):
 
     def test_rights_on_nested_field_but_no_subfields(self):
         """ Test default building of relations with no rights on subfields. """
-        self._add_field_perms('tests', 'account', 'id', 'user')
+        self._add_field_perms('tests', 'account', 'user')
         ser = self._get_serializer_instance()
         fields = ser.get_fields()
         self.assertEqual(fields['user'].__class__.__name__, 'NestedSerializer')
@@ -114,7 +114,7 @@ class TestModelSerializer(TestCase, ModelSerializerTestMixin):
         ser = self._get_serializer_instance()
         fields = ser.get_fields()
         self.assertIsInstance(fields, collections.OrderedDict)
-        self.assertEqual(set(fields), {'user', 'is_expired', 'id', 'cards',
+        self.assertEqual(set(fields), {'user', 'is_expired', 'cards',
                                        'full_name', 'expired_date'})
 
     def test_get_field_for_anonymous_user(self):
@@ -126,11 +126,11 @@ class TestModelSerializer(TestCase, ModelSerializerTestMixin):
 
     def test_get_field_for_authenticated_user(self):
         """ Test getting fields for an authenticated user. """
-        self._add_field_perms('tests', 'account', 'id', 'user')
+        self._add_field_perms('tests', 'account', 'user')
         ser = self._get_serializer_instance()
         fields = ser.get_fields()
         self.assertIsInstance(fields, collections.OrderedDict)
-        self.assertEqual(set(fields), {'user', 'id'})
+        self.assertEqual(set(fields), {'user'})
 
 
 class TestNestedRelations(TestCase, ModelSerializerTestMixin):

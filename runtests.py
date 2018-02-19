@@ -25,7 +25,7 @@ if not settings.configured:
             'django.contrib.messages.middleware.MessageMiddleware',
         ),
         ROOT_URLCONF='tests.urls',
-        USE_TZ=True,
+        USE_TZ=False,
         SECRET_KEY='foobar',
         # SILENCED_SYSTEM_CHECKS=['1_7.W001'],
     )
@@ -34,6 +34,7 @@ if not settings.configured:
 def runtests():
     argv = sys.argv[:1] + ['test'] + sys.argv[1:]
     execute_from_command_line(argv)
+
 
 if __name__ == '__main__':
     runtests()
