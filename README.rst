@@ -8,7 +8,7 @@ Compatibility
 
 Works with :
 
-  * Python 2.7, 3.3, 3.4, 3.5
+  * Python 2.7, 3.4, 3.5, 3.6
   * Django >= 1.8
   * Django Rest Framework >= 3.3
 
