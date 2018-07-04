@@ -9,8 +9,8 @@ Compatibility
 Works with :
 
   * Python 2.7, 3.4, 3.5, 3.6
-  * Django >= 1.8
-  * Django Rest Framework >= 3.3
+  * Django >= 1.10
+  * Django Rest Framework >= 3.5
 
 .. image:: https://travis-ci.org/unistra/django-rest-framework-fine-permissions.svg?branch=master
     :target: https://travis-ci.org/unistra/django-rest-framework-fine-permissions
