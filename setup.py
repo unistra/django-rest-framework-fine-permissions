@@ -18,7 +18,7 @@ with open('requirements.txt') as requirements:
 
 setup(
     name='djangorestframework-fine-permissions',
-    version='0.6.4',
+    version='0.7.0',
     packages=find_packages(),
     install_requires=libraries,
     dependency_links=dependency_links,
@@ -42,5 +42,8 @@ setup(
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5"
         "Programming Language :: Python :: 3.6",
+        'Framework :: Django',
+        'Framework :: Django :: 1.10',
+        'Framework :: Django :: 1.11',
     ]
 )
