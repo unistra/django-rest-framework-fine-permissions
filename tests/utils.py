@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from rest_framework_fine_permissions import models
 
-from .models import Card, Account, Service
+from .models import Card, Account, Service, TestUser
 
 
 def create_user(username='test', password='pass', **kwargs):
@@ -19,7 +19,8 @@ def create_superuser(username='supertest', email='supertest@test.com',
 def create_account(user):
     """ Create an account for tests. """
     from datetime import datetime
-    return Account.objects.create(user=user, expired_date=datetime.now())
+    test_user = TestUser.objects.create(username=user.username)
+    return Account.objects.create(user=test_user, expired_date=datetime.now())
 
 
 def create_card(account):

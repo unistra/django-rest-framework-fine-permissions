@@ -59,7 +59,7 @@ class TestModelSerializer(TestCase, ModelSerializerTestMixin):
         self.assertEqual(set(ser._get_default_field_names(ser._declared_fields,
                              self._get_model_info())),
                          {'id', 'expired_date', 'is_expired', 'cards', 'user',
-                          'full_name'})
+                          'full_name', 'service_names'})
 
     def test_nested_class(self):
         """ Test retrieving nested relation. """
@@ -83,8 +83,8 @@ class TestModelSerializer(TestCase, ModelSerializerTestMixin):
         user_relation = self._get_relation_info('user')
         user_nested_class = ser._get_nested_class(1, user_relation)
 
-        from django.contrib.auth.models import User
-        self.assertEqual(user_nested_class.Meta.model, User)
+        from .models import TestUser
+        self.assertEqual(user_nested_class.Meta.model, TestUser)
 
     def test_rights_on_nested_field_but_no_subfields(self):
         """ Test default building of relations with no rights on subfields. """
@@ -114,8 +114,9 @@ class TestModelSerializer(TestCase, ModelSerializerTestMixin):
         ser = self._get_serializer_instance()
         fields = ser.get_fields()
         self.assertIsInstance(fields, collections.OrderedDict)
-        self.assertEqual(set(fields), {'user', 'is_expired', 'cards',
-                                       'full_name', 'expired_date'})
+        self.assertEqual(
+            set(fields), {'user', 'is_expired', 'cards', 'full_name',
+                          'expired_date', 'service_names'})
 
     def test_get_field_for_anonymous_user(self):
         """ Test getting all fields for an anonymous user. """
@@ -168,7 +169,7 @@ class TestNestedRelations(TestCase, ModelSerializerTestMixin):
     def test_with_rights_on_nested_subfields(self):
         """ Test with rights on subfields. """
         self._add_field_perms('tests', 'account', 'id', 'user')
-        self._add_field_perms('auth', 'user', 'username')
+        self._add_field_perms('tests', 'testuser', 'username')
         ser = self._get_serializer_instance()
         user_nested_field = self._get_nested_field(ser, 'user')
         fields = user_nested_field.get_fields()

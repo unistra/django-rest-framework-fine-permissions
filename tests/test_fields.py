@@ -57,7 +57,7 @@ class TestModelFieldPermissions(TestCase):
         data = ser.data
 
         self.assertEqual(sorted(data['account']), ['user'])
-        self.assertEqual(data['account']['user']['id'], self.test_user.id)
+        self.assertEqual(data['account']['user']['id'], self.account.id)
 
     def test_list_data_in_permissions_field(self):
         """ Test with a many to one field. """

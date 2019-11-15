@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 @python_2_unicode_compatible
 class FieldPermission(models.Model):
     name = models.CharField(_('name'), max_length=255)
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('field permission')
@@ -27,7 +27,7 @@ class FieldPermission(models.Model):
 
 @python_2_unicode_compatible
 class UserFieldPermissions(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     permissions = models.ManyToManyField(
         FieldPermission,
         related_name='user_field_permissions',
@@ -44,8 +44,8 @@ class UserFieldPermissions(models.Model):
 
 @python_2_unicode_compatible
 class FilterPermissionModel(models.Model):
-    user = models.ForeignKey(User)
-    content_type = models.ForeignKey(ContentType)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     filter = models.TextField()
 
     class Meta:

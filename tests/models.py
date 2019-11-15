@@ -1,8 +1,13 @@
 from django.db import models
 
+
+class TestUser(models.Model):
+    username = models.CharField(max_length=255)
+
+
 class Account(models.Model):
 
-    user = models.OneToOneField('auth.User')
+    user = models.OneToOneField(TestUser, on_delete=models.CASCADE)
     expired_date = models.DateTimeField()
 
     @property
@@ -13,12 +18,18 @@ class Account(models.Model):
         from datetime import datetime
         return self.expired_date > datetime.now()
 
+    @property
+    def services(self):
+        return Service.objects.filter(cards__account__pk=self.pk)
+
+
 class Service(models.Model):
 
     name = models.CharField(max_length=100)
 
+
 class Card(models.Model):
 
-    account = models.ForeignKey(Account, related_name='cards')
-    services = models.ManyToManyField(Service, related_name='+')
-
+    account = models.ForeignKey(Account, related_name='cards',
+                                on_delete=models.CASCADE)
+    services = models.ManyToManyField(Service, related_name='cards')

@@ -16,7 +16,7 @@ class FilterPermissionBackend(BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         user = request.user
-        if not user.is_superuser and not user.is_anonymous() and isinstance(queryset, QuerySet):
+        if not user.is_superuser and not user.is_anonymous and isinstance(queryset, QuerySet):
             try:
                 model = queryset.model
                 ct = ContentType.objects.get_for_model(model)

@@ -6,5 +6,5 @@ from rest_framework_fine_permissions.urls import urlpatterns as drffp_urls
 
 urlpatterns = drffp_urls
 urlpatterns += [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]

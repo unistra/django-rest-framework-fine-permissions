@@ -19,6 +19,7 @@ class AccountSerializer(serializers.ModelPermissionsSerializer):
                                               read_only=True)
     full_name = drf_serializers.CharField(source='full_name', read_only=True)
     cards = fields.ModelPermissionsField('tests.CardSerializer')
+    service_names = fields.ModelPermissionsField(ServiceSerializer, source='services')
 
     class Meta:
         depth = 1
