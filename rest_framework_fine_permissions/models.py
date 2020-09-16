@@ -2,8 +2,7 @@
 
 """
 """
-
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -27,7 +26,7 @@ class FieldPermission(models.Model):
 
 @python_2_unicode_compatible
 class UserFieldPermissions(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     permissions = models.ManyToManyField(
         FieldPermission,
         related_name='user_field_permissions',
@@ -44,7 +43,7 @@ class UserFieldPermissions(models.Model):
 
 @python_2_unicode_compatible
 class FilterPermissionModel(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     filter = models.TextField()
 
