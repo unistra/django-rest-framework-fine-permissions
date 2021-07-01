@@ -48,6 +48,7 @@ if not settings.configured:
         ROOT_URLCONF='tests.urls',
         USE_TZ=False,
         SECRET_KEY='foobar',
+        DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
         # SILENCED_SYSTEM_CHECKS=['1_7.W001'],
     )
 
