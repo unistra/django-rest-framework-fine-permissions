@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 """
 
@@ -12,7 +10,7 @@ from django.utils.html import format_html
 
 from .fields import ModelPermissionsField
 from .models import (
-    FieldPermission, UserFieldPermissions, FilterPermissionModel)
+    FieldPermission, FilterPermissionModel, UserFieldPermissions)
 from .utils import get_field_permissions
 from .serializers import QSerializer
 

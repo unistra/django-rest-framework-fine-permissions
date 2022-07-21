@@ -1,9 +1,10 @@
 import collections
-from django.test import TestCase
-from django.http import HttpRequest
-from rest_framework.utils.model_meta import get_field_info
 
+from rest_framework.utils.model_meta import get_field_info
 from rest_framework_fine_permissions import fields
+
+from django.http import HttpRequest
+from django.test import TestCase
 
 from . import utils
 from . import serializers

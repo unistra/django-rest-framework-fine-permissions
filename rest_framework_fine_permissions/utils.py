@@ -1,18 +1,17 @@
-# -*- coding: utf-8 -*-
-
 """
 """
 
-from importlib import import_module
 import inspect
-from collections import OrderedDict
 import logging
+import string
+from collections import OrderedDict
+from importlib import import_module
+from itertools import chain
+
+from rest_framework.utils.model_meta import get_field_info
 
 from django.apps import apps
 from django.conf import settings
-from rest_framework.utils.model_meta import get_field_info
-from six import iterkeys, string_types
-from itertools import chain
 
 
 logger = logging.getLogger(__name__)
@@ -27,7 +26,7 @@ def get_application(app_label):
 
 def get_serializer(serializer):
     """ Load a serializer. """
-    if isinstance(serializer, string_types):
+    if isinstance(serializer, str):
         try:
             app_label, serializer_name = serializer.split('.')
             app_package = get_application(app_label)
@@ -59,9 +58,9 @@ def merge_fields_and_pk(pk, fields):
 
 def get_model_fields(model):
     fields_info = get_field_info(model)
-    return chain(iterkeys(merge_fields_and_pk(fields_info.pk,
-                                              fields_info.fields)),
-                 iterkeys(fields_info.relations))
+    return chain((merge_fields_and_pk(
+                    fields_info.pk,fields_info.fields).keys()),
+                 fields_info.relations.keys())
 
 
 def get_permitted_fields(model, serializer):

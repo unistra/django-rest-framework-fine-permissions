@@ -1,23 +1,15 @@
-# -*- coding: utf-8 -*-
-
-from django.test import TestCase
-from django.db.models import Q
-from rest_framework_fine_permissions.serializers import QSerializer
 import datetime
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
+
+from rest_framework_fine_permissions.filters import FilterPermissionBackend
 from rest_framework_fine_permissions.models import FilterPermissionModel
 from rest_framework_fine_permissions.permissions import FilterPermission
+from rest_framework_fine_permissions.serializers import QSerializer
+
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from django.http import HttpRequest
-from rest_framework_fine_permissions.filters import FilterPermissionBackend
-
-"""
-
-Run this test under a django application, with the following command :
-
-python manage.py test rest_framework_fine_permissions
-
-"""
+from django.test import TestCase
 
 
 class TestQSerializer(TestCase):

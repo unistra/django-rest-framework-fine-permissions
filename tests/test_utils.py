@@ -1,5 +1,7 @@
-from django.test import TestCase
 from rest_framework_fine_permissions import utils
+
+from django.test import TestCase
+
 from . import serializers as test_serializers
 from .models import Account
 

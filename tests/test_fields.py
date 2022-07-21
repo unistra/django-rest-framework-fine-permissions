@@ -1,8 +1,9 @@
-from django.test import TestCase
-from django.http import HttpRequest
 from rest_framework.exceptions import ValidationError
 from rest_framework_fine_permissions.fields import (
     get_serializer, ModelPermissionsField)
+
+from django.http import HttpRequest
+from django.test import TestCase
 
 from . import models
 from . import serializers

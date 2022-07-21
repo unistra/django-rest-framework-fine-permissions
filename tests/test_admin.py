@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
+from rest_framework_fine_permissions.admin import UserFieldPermissionsForm
+from rest_framework_fine_permissions.models import UserFieldPermissions
 
 from django.contrib.auth.models import User
 from django.test import TestCase
-
-from rest_framework_fine_permissions.admin import UserFieldPermissionsForm
-from rest_framework_fine_permissions.models import UserFieldPermissions
 
 
 class TestUserFieldPermissionsForm(TestCase):

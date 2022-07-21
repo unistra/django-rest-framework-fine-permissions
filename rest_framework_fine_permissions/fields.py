@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
-
 """
 """
 
-import logging
 import collections
+import logging
+
+from rest_framework import serializers
+from rest_framework.fields import Field
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils.encoding import smart_text
-from rest_framework import serializers
-from rest_framework.fields import Field
+from django.utils.encoding import smart_str
 
 from .serializers import ModelPermissionsSerializer
 from .utils import get_serializer
@@ -48,11 +47,11 @@ class ModelPermissionsField(Field):
             try:
                 return self.queryset.get(pk=data)
             except ObjectDoesNotExist:
-                self.fail('does_not_exist', value=smart_text(data))
+                self.fail('does_not_exist', value=smart_str(data))
 
     def to_representation(self, obj):
         """ Represent data for the field. """
-        many = isinstance(obj, collections.Iterable) \
+        many = isinstance(obj, collections.abc.Iterable) \
             or isinstance(obj, models.Manager) \
             and not isinstance(obj, dict)
 

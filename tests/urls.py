@@ -1,10 +1,9 @@
-from django.conf.urls import include, url
-from django.contrib import admin
-
 from rest_framework_fine_permissions.urls import urlpatterns as drffp_urls
 
+from django.contrib import admin
+from django.urls import path
 
 urlpatterns = drffp_urls
 urlpatterns += [
-    url(r'^admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
 ]

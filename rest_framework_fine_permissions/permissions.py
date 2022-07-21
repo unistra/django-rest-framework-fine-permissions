@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-
 """ Provides new permission policies for django-rest-framework
 """
 
-from rest_framework.permissions import DjangoModelPermissions, BasePermission
-from django.contrib.contenttypes.models import ContentType
+from rest_framework.permissions import BasePermission, DjangoModelPermissions
 from rest_framework_fine_permissions.models import FilterPermissionModel
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework_fine_permissions.serializers import QSerializer
+
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class FullDjangoModelPermissions(DjangoModelPermissions):

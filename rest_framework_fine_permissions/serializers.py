@@ -1,18 +1,17 @@
-# -*- coding: utf-8 -*-
-
 """
 """
 
 import base64
-from collections import OrderedDict
-from datetime import datetime, date
 import json
 import time
+from collections import OrderedDict
+from datetime import datetime, date
+
+from rest_framework import serializers
+from rest_framework.utils.field_mapping import get_relation_kwargs
 
 from django.core.serializers.base import SerializationError
 from django.db.models import Q
-from rest_framework import serializers
-from rest_framework.utils.field_mapping import get_relation_kwargs
 
 from .models import FieldPermission
 

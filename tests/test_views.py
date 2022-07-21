@@ -1,17 +1,16 @@
 import json
 
+from rest_framework_fine_permissions.models import UserFieldPermissions
+
+from django.contrib import messages
 from django.contrib.messages.storage.cookie import (
     CookieStorage, MessageDecoder, MessageEncoder,
 )
-
 from django.contrib.messages import get_messages
-from django.contrib import messages
-
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest
 from django.test import TestCase
 
-from rest_framework_fine_permissions.models import UserFieldPermissions
 from . import utils
 
 
@@ -36,6 +35,7 @@ class TestViews(TestCase):
         if not cookie or cookie['max-age'] == 0:
             return []
 
+        # return list(get_messages(response.wsgi_request))
         return storage._decode(cookie.value)
 
 

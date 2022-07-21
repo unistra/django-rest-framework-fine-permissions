@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
-from django.core import management
-from django.core.management.base import BaseCommand, CommandError
-from django.core import serializers
-from rest_framework_fine_permissions.models import UserFieldPermissions, FieldPermission
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 import json
-from optparse import make_option
 import sys
+from optparse import make_option
+
+from rest_framework_fine_permissions.models import UserFieldPermissions, FieldPermission
+
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core import management, serializers
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.management.base import BaseCommand, CommandError
 
 
 
@@ -45,14 +46,10 @@ class Command(BaseCommand):
             finally:
                 user_field_permissions.permissions.add(p)
 
-
-
         if len(args) !=1:
              raise CommandError("Specifies a json file created by the fine_permissions_dump command")
         else:
             try:
-
-
                 with open(args[0], 'r') as json_file:
                     myjson = json.load(json_file)
 
@@ -66,7 +63,5 @@ class Command(BaseCommand):
                         content_type = ContentType.objects.get(app_label=f["app_label"], model=f["model"])
                         add_permissions(user_field_permissions, content_type, f['name'])
 
-
             except Exception as e:
                 raise CommandError(e)
-

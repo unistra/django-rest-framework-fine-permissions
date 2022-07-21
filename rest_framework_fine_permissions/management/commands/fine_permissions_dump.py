@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
-from django.core.management.base import BaseCommand, CommandError
+import json
+
 from rest_framework_fine_permissions.models import UserFieldPermissions
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-import json
+from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
@@ -29,8 +31,6 @@ class Command(BaseCommand):
             except ObjectDoesNotExist as e:
                 raise CommandError("This user doesn't have fields permissions")
 
-
-
         if len(args) !=1:
             raise CommandError("Specifies a user")
         else:
@@ -47,4 +47,3 @@ class Command(BaseCommand):
 
             except:
                 raise
-

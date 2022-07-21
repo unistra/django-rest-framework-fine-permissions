@@ -1,7 +1,6 @@
-
+from rest_framework import serializers as drf_serializers
 from rest_framework_fine_permissions import serializers
 from rest_framework_fine_permissions import fields
-from rest_framework import serializers as drf_serializers
 
 from .models import Account, Card, Service
 

@@ -1,8 +1,9 @@
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from rest_framework_fine_permissions import models
 
-from .models import Card, Account, Service, TestUser
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+
+from .models import Account, Card, Service, TestUser
 
 
 def create_user(username='test', password='pass', **kwargs):

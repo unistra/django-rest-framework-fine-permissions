@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.contenttypes.models import ContentType
+from rest_framework.filters import BaseFilterBackend
 from rest_framework_fine_permissions.serializers import QSerializer
 from rest_framework_fine_permissions.models import FilterPermissionModel
-from rest_framework.filters import BaseFilterBackend
+
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.db.models.query import QuerySet
 
 

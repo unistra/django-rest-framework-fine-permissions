@@ -48,7 +48,23 @@ if not settings.configured:
         ROOT_URLCONF='tests.urls',
         USE_TZ=False,
         SECRET_KEY='foobar',
-        DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+        LOGGING = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'handlers': {
+                'null': {
+                    'level': 'DEBUG',
+                    'class': 'logging.NullHandler'
+                },
+            },
+            'loggers': {
+                'rest_framework_fine_permissions': {
+                    'handlers': ['null'],
+                    'level': 'DEBUG',
+                    'propagate': True
+                }
+            },
+        }
         # SILENCED_SYSTEM_CHECKS=['1_7.W001'],
     )
 
