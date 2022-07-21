@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from setuptools import setup
 from setuptools import find_packages
@@ -18,7 +17,7 @@ with open('requirements.txt') as requirements:
 
 setup(
     name='djangorestframework-fine-permissions',
-    version='0.9.0',
+    version='0.9.1',
     packages=find_packages(exclude=["tests*"]),
     install_requires=libraries,
     dependency_links=dependency_links,
@@ -38,12 +37,11 @@ setup(
         "Framework :: Django",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         'Framework :: Django',
-        'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.2',
         'Framework :: Django :: 3.2',
     ]
