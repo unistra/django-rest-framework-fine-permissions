@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 
 from .fields import ModelPermissionsField
 from .models import (
@@ -95,14 +95,19 @@ class UserFieldPermissionsForm(forms.ModelForm):
                     model_perms[self.field_serializers[permission]] = permission
 
                     if name in model_perms:
-                        conflicts.append(
-                            '<li><b>%s</b> and <b>%s</b></li>'
-                            % (permission, model_perms[name]))
+                        conflicts.append((permission, model_perms[name]))
 
         if conflicts:
-            msg = 'Recursive ModelPermissionsField call between<ul>{}</ul>'\
-                .format(''.join(conflicts))
-            raise forms.ValidationError(format_html(msg))
+            raise forms.ValidationError(
+                format_html(
+                    'Recursive ModelPermissionsField call between<ul>{}</ul>',
+                    format_html_join(
+                        '\n',
+                        '<li><b>{}</b> and <b>{}</b></li>',
+                        (conflict for conflict in conflicts)
+                    )
+                )
+            )
 
         self.cleaned_data['permissions'] = field_permissions
 

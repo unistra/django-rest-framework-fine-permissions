@@ -114,7 +114,7 @@ class TestModelSerializer(TestCase, ModelSerializerTestMixin):
         self.user.save()
         ser = self._get_serializer_instance()
         fields = ser.get_fields()
-        self.assertIsInstance(fields, collections.OrderedDict)
+        self.assertIsInstance(fields, dict)
         self.assertEqual(
             set(fields), {'user', 'is_expired', 'cards', 'full_name',
                           'expired_date', 'service_names'})
